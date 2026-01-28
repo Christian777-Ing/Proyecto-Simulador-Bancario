@@ -1,40 +1,53 @@
 public class Usuario {
-    private int id;
-    private String nombre;
-    private String correo;
-    private String contrasena; // Se guarda cifrada
+
+    private int idUsuario;
+    private String username;
+    private String passwordHash;
+    private Rol rol;
+
+    public enum Rol {
+        ADMIN, CLIENTE
+    }
 
     public Usuario() {}
 
-    public Usuario(int id, String nombre, String correo, String contrasena) {
-        this.id = id;
-        this.nombre = nombre;
-        this.correo = correo;
-        this.contrasena = contrasena;
-    }
-
-    // Constructor sin ID (para crear nuevos usuarios)
-    public Usuario(String nombre, String correo, String contrasena) {
-        this.nombre = nombre;
-        this.correo = correo;
-        this.contrasena = contrasena;
+    public Usuario(int idUsuario, String username, String passwordHash, Rol rol) {
+        this.idUsuario = idUsuario;
+        this.username = username;
+        this.passwordHash = passwordHash;
+        this.rol = rol;
     }
 
     // Getters y Setters
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getIdUsuario() {
+        return idUsuario;
+    }
 
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
+    public void setIdUsuario(int idUsuario) {
+        this.idUsuario = idUsuario;
+    }
 
-    public String getCorreo() { return correo; }
-    public void setCorreo(String correo) { this.correo = correo; }
+    public String getUsername() {
+        return username;
+    }
 
-    public String getContrasena() { return contrasena; }
-    public void setContrasena(String contrasena) { this.contrasena = contrasena; }
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-    @Override
-    public String toString() {
-        return "Usuario{id=" + id + ", nombre='" + nombre + "', correo='" + correo + "'}";
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public Rol getRol() {
+        return rol;
+    }
+
+    public void setRol(Rol rol) {
+        this.rol = rol;
     }
 }

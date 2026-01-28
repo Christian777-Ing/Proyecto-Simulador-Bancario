@@ -1,42 +1,81 @@
 import java.math.BigDecimal;
 
 public class Cuenta {
-    private int id;
-    private int usuarioId;
+
+    private int idCuenta;
     private String numeroCuenta;
+    private Tipo tipo;
     private BigDecimal saldo;
+    private Estado estado;
+    private int idCliente;
+
+    public enum Tipo {
+        AHORROS, CORRIENTE
+    }
+
+    public enum Estado {
+        ACTIVA, CERRADA
+    }
 
     public Cuenta() {}
 
-    public Cuenta(int id, int usuarioId, String numeroCuenta, BigDecimal saldo) {
-        this.id = id;
-        this.usuarioId = usuarioId;
+    public Cuenta(int idCuenta, String numeroCuenta, Tipo tipo,
+                  BigDecimal saldo, Estado estado, int idCliente) {
+        this.idCuenta = idCuenta;
         this.numeroCuenta = numeroCuenta;
+        this.tipo = tipo;
         this.saldo = saldo;
-    }
-
-    // Constructor sin ID (para crear nueva cuenta)
-    public Cuenta(int usuarioId, String numeroCuenta, BigDecimal saldo) {
-        this.usuarioId = usuarioId;
-        this.numeroCuenta = numeroCuenta;
-        this.saldo = saldo;
+        this.estado = estado;
+        this.idCliente = idCliente;
     }
 
     // Getters y Setters
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getIdCuenta() {
+        return idCuenta;
+    }
 
-    public int getUsuarioId() { return usuarioId; }
-    public void setUsuarioId(int usuarioId) { this.usuarioId = usuarioId; }
+    public void setIdCuenta(int idCuenta) {
+        this.idCuenta = idCuenta;
+    }
 
-    public String getNumeroCuenta() { return numeroCuenta; }
-    public void setNumeroCuenta(String numeroCuenta) { this.numeroCuenta = numeroCuenta; }
+    public String getNumeroCuenta() {
+        return numeroCuenta;
+    }
 
-    public BigDecimal getSaldo() { return saldo; }
-    public void setSaldo(BigDecimal saldo) { this.saldo = saldo; }
+    public void setNumeroCuenta(String numeroCuenta) {
+        this.numeroCuenta = numeroCuenta;
+    }
 
-    @Override
-    public String toString() {
-        return "Cuenta{numeroCuenta='" + numeroCuenta + "', saldo=" + saldo + "}";
+    public Tipo getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(Tipo tipo) {
+        this.tipo = tipo;
+    }
+
+    public BigDecimal getSaldo() {
+        return saldo;
+    }
+
+    public void setSaldo(BigDecimal saldo) {
+        this.saldo = saldo;
+    }
+
+    public Estado getEstado() {
+        return estado;
+    }
+
+    public void setEstado(Estado estado) {
+        this.estado = estado;
+    }
+
+    public int getIdCliente() {
+        return idCliente;
+    }
+
+    public void setIdCliente(int idCliente) {
+        this.idCliente = idCliente;
     }
 }
+
