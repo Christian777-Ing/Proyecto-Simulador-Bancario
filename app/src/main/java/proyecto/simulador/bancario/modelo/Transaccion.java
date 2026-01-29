@@ -1,4 +1,4 @@
-package modelo;
+package proyecto.simulador.bancario.modelo;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

@@ -1,9 +1,9 @@
-package DAO;
+package proyecto.simulador.bancario.DAO;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import Data_Base.Conexion;
-import modelo.Cliente;
+import proyecto.simulador.bancario.Data_Base.Conexion;
+import proyecto.simulador.bancario.modelo.Cliente;
 
 public class ClienteDAO {
 

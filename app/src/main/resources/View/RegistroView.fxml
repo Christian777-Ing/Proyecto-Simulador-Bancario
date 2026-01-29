@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="10" alignment="CENTER" xmlns:fx="http://javafx.com/fxml" 
+      fx:controller="proyecto.simulador.bancario.controlador.RegistroController">
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+    <Label text="Nuevo Cliente" style="-fx-font-size: 18;"/>
+    <TextField fx:id="txtUser" promptText="Nombre de Usuario"/>
+    <PasswordField fx:id="txtPass" promptText="Contraseña"/>
+    <TextField fx:id="txtNombre" promptText="Nombre Completo"/>
+    <TextField fx:id="txtCedula" promptText="Cédula"/>
+    <TextField fx:id="txtEmail" promptText="Email"/>
+    <Button text="Crear Cuenta" onAction="#onRegistrar" style="-fx-background-color: green; -fx-text-fill: white;"/>
+    <Button text="Cancelar" onAction="#onVolver"/>
+</VBox>

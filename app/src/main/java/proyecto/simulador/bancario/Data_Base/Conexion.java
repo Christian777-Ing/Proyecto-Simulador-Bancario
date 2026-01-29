@@ -1,4 +1,4 @@
-package Data_Base;
+package proyecto.simulador.bancario.Data_Base;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

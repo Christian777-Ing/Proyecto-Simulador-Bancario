@@ -1,16 +1,16 @@
-package DAO;
+package proyecto.simulador.bancario.DAO;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import Data_Base.Conexion;
-import modelo.Cuenta;
+import proyecto.simulador.bancario.Data_Base.Conexion;
+import proyecto.simulador.bancario.modelo.Cuenta;
 
 public class CuentaDAO {
     
-    public void crearCuenta(modelo.Cuenta cuenta) {
+    public void crearCuenta(Cuenta cuenta) {
         // Lógica para insertar una cuenta en la base de datos
         String sql = "INSERT INTO cuentas (numero_cuenta, tipo, saldo, estado, id_cliente) " +
                      "VALUES (?, ?, ?, ?, ?)";

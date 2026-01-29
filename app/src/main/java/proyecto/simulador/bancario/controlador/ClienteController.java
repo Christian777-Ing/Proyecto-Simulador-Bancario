@@ -1,7 +1,7 @@
-package controlador;
+package proyecto.simulador.bancario.controlador;
 
-import Service.ClienteService;
-import modelo.Cliente;
+import proyecto.simulador.bancario.modelo.Cliente;
+import proyecto.simulador.bancario.Service.ClienteService;
 
 public class ClienteController {
 

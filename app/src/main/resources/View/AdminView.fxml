@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="20" style="-fx-background-color: white;" xmlns:fx="http://javafx.com/fxml" 
+      fx:controller="proyecto.simulador.bancario.controlador.AdminController">
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+    <Label text="PANEL DE ADMINISTRACIÓN" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+    
+    <TabPane tabClosingPolicy="UNAVAILABLE">
+        <Tab text="Registrar Nuevo Cliente">
+            <VBox spacing="10">
+                <padding><Insets top="15" right="15" bottom="15" left="15"/></padding>
+                <GridPane hgap="10" vgap="10">
+                    <Label text="Nombre Completo:"/> <TextField fx:id="txtNombre" GridPane.columnIndex="1"/>
+                    <Label text="Cédula:" GridPane.rowIndex="1"/> <TextField fx:id="txtCedula" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    <Label text="Email:" GridPane.rowIndex="2"/> <TextField fx:id="txtEmail" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                    <Label text="Username:" GridPane.rowIndex="3"/> <TextField fx:id="txtNewUser" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                    <Label text="Password:" GridPane.rowIndex="4"/> <PasswordField fx:id="txtNewPass" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                </GridPane>
+                <Button text="Crear Usuario y Cliente" onAction="#onGuardarTodo" 
+                        style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;"/>
+            </VBox>
+        </Tab>
+    </TabPane>
+</VBox>

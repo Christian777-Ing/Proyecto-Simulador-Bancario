@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?> <VBox xmlns:fx="http://javafx.com/fxml" 
+      fx:controller="proyecto.simulador.bancario.controlador.CuentaController" 
+      spacing="10">
+    
+    <padding>
+        <Insets top="15" right="15" bottom="15" left="15"/>
+    </padding>
+
+    <Label text="Cuentas del Cliente" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+    <TableView fx:id="tablaCuentas" prefHeight="200">
+        <columns>
+            <TableColumn text="ID" fx:id="colId"/>
+            <TableColumn text="Número" fx:id="colNumero"/>
+            <TableColumn text="Tipo" fx:id="colTipo"/>
+            <TableColumn text="Saldo" fx:id="colSaldo"/>
+            <TableColumn text="Estado" fx:id="colEstado"/>
+        </columns>
+    </TableView>
+
+    <HBox spacing="10">
+        <Button text="Depositar" onAction="#onDepositar"/>
+        <Button text="Retirar" onAction="#onRetirar"/>
+        <Button text="Transferir" onAction="#onTransferir"/>
+        <Button text="Ver Historial" onAction="#onVerHistorial"/>
+    </HBox>
+
+</VBox>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox alignment="CENTER" spacing="15" xmlns:fx="http://javafx.com/fxml" 
+      fx:controller="proyecto.simulador.bancario.controlador.LoginController">
+    <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>
+    <Label text="BANCO LOGIN" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
+    <TextField fx:id="txtUsername" promptText="Usuario"/>
+    <PasswordField fx:id="txtPassword" promptText="Contraseña"/>
+    <Button text="Ingresar" onAction="#onLogin" prefWidth="150"/>
+    <Hyperlink text="Registrarse" onAction="#onIrARegistro"/>
+</VBox>

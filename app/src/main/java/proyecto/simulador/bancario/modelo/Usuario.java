@@ -1,3 +1,5 @@
+package proyecto.simulador.bancario.modelo;
+
 public class Usuario {
 
     private int idUsuario;

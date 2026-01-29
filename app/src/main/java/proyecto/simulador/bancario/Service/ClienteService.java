@@ -1,7 +1,7 @@
-package Service;
+package proyecto.simulador.bancario.Service;
 
-import DAO.ClienteDAO;
-import modelo.Cliente;
+import proyecto.simulador.bancario.DAO.ClienteDAO;
+import proyecto.simulador.bancario.modelo.Cliente;
 
 public class ClienteService {
 

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="15" alignment="CENTER" xmlns:fx="http://javafx.com/fxml" 
+      fx:controller="proyecto.simulador.bancario.controlador.OperacionController">
+    <padding><Insets top="25" right="25" bottom="25" left="25"/></padding>
+
+    <Label fx:id="lblTitulo" text="Operación" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+    <Label fx:id="lblCuentaInfo" text="Cuenta: XXXX"/>
+    
+    <TextField fx:id="txtMonto" promptText="Ingrese el monto $0.00"/>
+    
+    <HBox spacing="10" alignment="CENTER">
+        <Button text="Confirmar" onAction="#onConfirmar" style="-fx-background-color: #2980b9; -fx-text-fill: white;"/>
+        <Button text="Cancelar" onAction="#onCancelar"/>
+    </HBox>
+</VBox>
