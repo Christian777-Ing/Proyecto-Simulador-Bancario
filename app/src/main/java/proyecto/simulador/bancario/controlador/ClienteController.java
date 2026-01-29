@@ -1,17 +1,23 @@
 package proyecto.simulador.bancario.controlador;
 
 import proyecto.simulador.bancario.modelo.Cliente;
+
+import java.time.LocalDate;
+
 import proyecto.simulador.bancario.Service.ClienteService;
 
 public class ClienteController {
 
     private final ClienteService clienteService = new ClienteService();
 
-    public void crearCliente(String nombre, String cedula, String email,
+    public void crearCliente(String pNombre, String sNombre, String pApellido, String sApellido,
+                             String sexo, LocalDate fechaNac, String cedula, String email,
                              String telefono, String direccion, Cliente.Estado estado, int idUsuario) {
 
+        // Llama al servicio que contiene la validación de 18 años
         clienteService.crearCliente(
-            nombre, cedula, email, telefono, direccion, estado, idUsuario
+            pNombre, sNombre, pApellido, sApellido, sexo, 
+            fechaNac, cedula, email, telefono, direccion, estado, idUsuario
         );
     }
 

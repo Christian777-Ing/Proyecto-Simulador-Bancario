@@ -2,31 +2,39 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?> <VBox xmlns:fx="http://javafx.com/fxml" 
-      fx:controller="proyecto.simulador.bancario.controlador.CuentaController" 
-      spacing="10">
-    
-    <padding>
-        <Insets top="15" right="15" bottom="15" left="15"/>
-    </padding>
+<?import javafx.geometry.Insets?> 
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controller.CuentaController"
+            stylesheets="@/css/bank-theme.css">
 
-    <Label text="Cuentas del Cliente" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+    <top>
+        <HBox spacing="15" alignment="CENTER_LEFT"
+              style="-fx-padding:15; -fx-background-color:#0A2A43;">
+            <Label text="Mis Cuentas"
+                   style="-fx-text-fill:white; -fx-font-size:22;"/>
+        </HBox>
+    </top>
 
-    <TableView fx:id="tablaCuentas" prefHeight="200">
-        <columns>
-            <TableColumn text="ID" fx:id="colId"/>
-            <TableColumn text="Número" fx:id="colNumero"/>
-            <TableColumn text="Tipo" fx:id="colTipo"/>
-            <TableColumn text="Saldo" fx:id="colSaldo"/>
-            <TableColumn text="Estado" fx:id="colEstado"/>
-        </columns>
-    </TableView>
+    <center>
+        <TableView fx:id="tablaCuentas">
+            <columns>
+                <TableColumn text="N° Cuenta" fx:id="colNumero"/>
+                <TableColumn text="Tipo" fx:id="colTipo"/>
+                <TableColumn text="Saldo" fx:id="colSaldo"/>
+                <TableColumn text="Estado" fx:id="colEstado"/>
+            </columns>
+        </TableView>
+    </center>
 
-    <HBox spacing="10">
-        <Button text="Depositar" onAction="#onDepositar"/>
-        <Button text="Retirar" onAction="#onRetirar"/>
-        <Button text="Transferir" onAction="#onTransferir"/>
-        <Button text="Ver Historial" onAction="#onVerHistorial"/>
-    </HBox>
-
-</VBox>
+    <bottom>
+        <HBox spacing="15" alignment="CENTER"
+              style="-fx-padding:15;">
+            <Button text="Depositar" onAction="#onDepositar"
+                    styleClass="button btn-success"/>
+            <Button text="Retirar" onAction="#onRetirar"
+                    styleClass="button btn-danger"/>
+            <Button text="Historial" onAction="#onVerHistorial"
+                    styleClass="button btn-primary"/>
+        </HBox>
+    </bottom>
+</BorderPane>

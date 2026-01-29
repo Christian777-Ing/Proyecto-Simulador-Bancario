@@ -1,14 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox alignment="CENTER" spacing="15" xmlns:fx="http://javafx.com/fxml" 
-      fx:controller="proyecto.simulador.bancario.controlador.LoginController">
-    <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>
-    <Label text="BANCO LOGIN" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
-    <TextField fx:id="txtUsername" promptText="Usuario"/>
-    <PasswordField fx:id="txtPassword" promptText="Contraseña"/>
-    <Button text="Ingresar" onAction="#onLogin" prefWidth="150"/>
-    <Hyperlink text="Registrarse" onAction="#onIrARegistro"/>
-</VBox>
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="proyecto.simulador.bancario.controlador.LoginController"
+           stylesheets="@/css/bank-theme.css">
+
+    <!-- Fondo -->
+    <ImageView fitWidth="1200" fitHeight="800" preserveRatio="false">
+        <image>
+            <Image url="@/img/bg-bank.png"/>
+        </image>
+    </ImageView>
+
+    <!-- Card de Login -->
+    <VBox spacing="18" alignment="CENTER"
+          style="
+            -fx-background-color: rgba(255,255,255,0.95);
+            -fx-padding: 40;
+            -fx-background-radius: 20;
+            -fx-max-width: 360;
+            -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 20, 0, 0, 5);
+          ">
+
+        <!-- Logo -->
+        <ImageView fitWidth="80" preserveRatio="true">
+            <image>
+                <Image url="@/img/logo.png"/>
+            </image>
+        </ImageView>
+
+        <Label text="Banco Digital"
+               style="-fx-font-size: 26; -fx-font-weight: bold; -fx-text-fill: #0A2A43;"/>
+
+        <Label text="Accede de forma segura a tu cuenta"
+               style="-fx-text-fill: #546E7A;"/>
+
+        <TextField fx:id="txtUsername"
+                   promptText="Usuario"
+                   prefHeight="40"/>
+
+        <PasswordField fx:id="txtPassword"
+                       promptText="Contraseña"
+                       prefHeight="40"/>
+
+        <Button text="Ingresar"
+                onAction="#onLogin"
+                prefWidth="200"
+                prefHeight="40"
+                styleClass="button btn-primary"/>
+
+        <Separator prefWidth="220"/>
+
+        <Hyperlink text="¿No tienes cuenta? Regístrate"
+                   onAction="#onIrARegistro"
+                   style="-fx-font-size: 13;"/>
+    </VBox>
+</StackPane>
