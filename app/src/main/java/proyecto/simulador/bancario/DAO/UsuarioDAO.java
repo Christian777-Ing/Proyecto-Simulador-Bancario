@@ -4,25 +4,46 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import proyecto.simulador.bancario.Data_Base.Conexion;
 import proyecto.simulador.bancario.modelo.Usuario;
 
+
 public class UsuarioDAO {
 
-    public void crearUsuario(Usuario usuario) {
-        String sql = "INSERT INTO usuarios (username, password_hash, rol) VALUES (?, ?, ?)";
+    public int crearUsuario(Usuario usuario) {
+    String sql = "INSERT INTO usuarios (username, password_hash, rol) VALUES (?, ?, ?)";
+    
+    try (Connection conn = Conexion.getConexion();
+         PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        
+        ps.setString(1, usuario.getUsername());
+        ps.setString(2, usuario.getPasswordHash());
+        ps.setString(3, usuario.getRol().name());
+        
+        int rowsAffected = ps.executeUpdate();
 
-        try (PreparedStatement ps = Conexion.getConexion().prepareStatement(sql)) {
-            ps.setString(1, usuario.getUsername());
-            ps.setString(2, usuario.getPasswordHash());
-            ps.setString(3, usuario.getRol().name());
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (rowsAffected > 0) {
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1); 
+                }
+            }
+        }
+    } catch (SQLException e) {
+        // ESTO ES VITAL: Imprime el error real en la consola de NetBeans/IntelliJ
+        System.err.println("--- ERROR AL CREAR USUARIO ---");
+        System.err.println("Mensaje: " + e.getMessage());
+        System.err.println("Código de error: " + e.getErrorCode());
+        
+        if (e.getErrorCode() == 1062) { // Código MySQL para entrada duplicada
+            throw new RuntimeException("El nombre de usuario '" + usuario.getUsername() + "' ya está ocupado.");
         }
     }
-    
+    return -1; 
+}
+
     public Usuario buscarPorUsername(String username) {
         String sql = "SELECT * FROM usuarios WHERE username = ?";
         try (Connection conn = Conexion.getConexion();
@@ -35,7 +56,6 @@ public class UsuarioDAO {
                     user.setIdUsuario(rs.getInt("id_usuario"));
                     user.setUsername(rs.getString("username"));
                     user.setPasswordHash(rs.getString("password_hash"));
-                    // Mapeo del Enum
                     user.setRol(Usuario.Rol.valueOf(rs.getString("rol")));
                     return user;
                 }

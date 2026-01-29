@@ -53,33 +53,48 @@ public class RegistroController {
     @FXML
     public void onRegistrar() {
         try {
-            // 1. Validaciones de Negocio (Sin tocar DB)
+            // --- PASO 1: VALIDACIONES DE FORMATO Y LÓGICA (Memoria) ---
+            // Validamos usuario y contraseña (sin insertar aún)
             uServ.validarUsuario(txtUser.getText(), txtPass.getText());
-            
+
+            // Validaciones de la interfaz
             if (dpFecha.getValue() == null) throw new IllegalArgumentException("Fecha de nacimiento obligatoria.");
             if (cbSexo.getValue() == null) throw new IllegalArgumentException("Debe seleccionar un sexo.");
+            
+            // Validamos los datos del cliente antes de llamar al DAO
+            // (Podemos crear un método de validación en ClienteService que no inserte)
+            validarDatosClienteLocales(); 
 
-            // 2. Persistencia de Usuario
-            Usuario u = new Usuario(0, txtUser.getText(), txtPass.getText(), Usuario.Rol.CLIENTE);
-            uDao.crearUsuario(u); 
+            // --- PASO 2: PERSISTENCIA (Base de Datos) ---
+            // Solo llegamos aquí si TODO lo anterior fue correcto.
+            
+            // 1. Intentamos crear el usuario
+            int idGenerado = uServ.registrarNuevoUsuario(txtUser.getText(), txtPass.getText());
 
-            // 3. Persistencia de Cliente (Llamando a tu ClienteService con sus validaciones)
+            // 2. Intentamos crear el cliente
             cServ.crearCliente(
                 txtPNombre.getText(), txtSNombre.getText(), txtPApellido.getText(), txtSApellido.getText(),
                 cbSexo.getValue(), dpFecha.getValue(), txtCedula.getText(), txtEmail.getText(),
-                txtTelf.getText(), txtDir.getText(), Cliente.Estado.ACTIVO, u.getIdUsuario()
+                txtTelf.getText(), txtDir.getText(), Cliente.Estado.ACTIVO, idGenerado
             );
 
-            mostrarAlerta(Alert.AlertType.INFORMATION, "Éxito", "Registro completado.");
+            mostrarAlerta(Alert.AlertType.INFORMATION, "Éxito", "Registro completado con éxito.");
             onVolver();
 
         } catch (IllegalArgumentException e) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Validación", e.getMessage());
+            // Si algo falla aquí, NUNCA se ejecutó uServ.registrarNuevoUsuario
+            mostrarAlerta(Alert.AlertType.WARNING, "Dato Incorrecto", e.getMessage());
         } catch (Exception e) {
-            mostrarAlerta(Alert.AlertType.ERROR, "Error", "Ocurrió un error: " + e.getMessage());
+            mostrarAlerta(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
     }
 
+    // Método auxiliar para validar campos de texto antes de ir a la DB
+    private void validarDatosClienteLocales() {
+        if (txtPNombre.getText().isBlank()) throw new IllegalArgumentException("El nombre es obligatorio.");
+        if (txtCedula.getText().length() != 10) throw new IllegalArgumentException("La cédula debe tener 10 dígitos.");
+        // Agrega aquí todas las validaciones de texto que necesites
+    }
     @FXML
     public void onVolver() {
         try {
