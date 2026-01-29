@@ -18,20 +18,27 @@ public class LoginController {
     public void onLogin() {
         if (authService.login(txtUsername.getText(), txtPassword.getText())) {
             String vista = (LoginService.getUsuarioLogueado().getRol().name().equals("ADMIN"))
-                           ? "/View/AdminView.fxml" : "/View/CuentasView.fxml";
+                            ? "/View/AdminView.fxml" : "/View/CuentasView.fxml";
             navegar(vista);
         } else {
             new Alert(Alert.AlertType.ERROR, "Credenciales inválidas").show();
         }
     }
 
-    @FXML public void onIrARegistro() { navegar("/View/RegistroView.fxml"); }
+    // AHORA REDIRIGE AL PASO 1 (USUARIO)
+    @FXML 
+    public void onIrARegistro() { 
+        navegar("/View/RegistroUsuarioView.fxml"); 
+    }
 
     private void navegar(String fxml) {
         try {
             Parent root = FXMLLoader.load(getClass().getResource(fxml));
             Stage stage = (Stage) txtUsername.getScene().getWindow();
             stage.setScene(new Scene(root));
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { 
+            e.printStackTrace(); 
+            new Alert(Alert.AlertType.ERROR, "Error al cargar la vista: " + fxml).show();
+        }
     }
 }

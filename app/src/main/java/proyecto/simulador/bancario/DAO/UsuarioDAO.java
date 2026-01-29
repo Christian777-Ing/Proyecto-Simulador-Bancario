@@ -13,37 +13,36 @@ import proyecto.simulador.bancario.modelo.Usuario;
 public class UsuarioDAO {
 
     public int crearUsuario(Usuario usuario) {
-    String sql = "INSERT INTO usuarios (username, password_hash, rol) VALUES (?, ?, ?)";
-    
-    try (Connection conn = Conexion.getConexion();
-         PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        String sql = "INSERT INTO usuarios (username, password_hash, rol) VALUES (?, ?, ?)";
         
-        ps.setString(1, usuario.getUsername());
-        ps.setString(2, usuario.getPasswordHash());
-        ps.setString(3, usuario.getRol().name());
-        
-        int rowsAffected = ps.executeUpdate();
+        try (Connection conn = Conexion.getConexion();
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            
+            ps.setString(1, usuario.getUsername());
+            ps.setString(2, usuario.getPasswordHash());
+            ps.setString(3, usuario.getRol().name());
+            
+            int rowsAffected = ps.executeUpdate();
 
-        if (rowsAffected > 0) {
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next()) {
-                    return rs.getInt(1); 
+            if (rowsAffected > 0) {
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        int idGenerado = rs.getInt(1);
+                        // ¡ESTO ES LO QUE FALTABA! Actualizar el objeto recibido
+                        usuario.setIdUsuario(idGenerado); 
+                        return idGenerado; 
+                    }
                 }
             }
+        } catch (SQLException e) {
+            System.err.println("--- ERROR AL CREAR USUARIO ---");
+            if (e.getErrorCode() == 1062) { 
+                throw new RuntimeException("El nombre de usuario '" + usuario.getUsername() + "' ya está ocupado.");
+            }
+            throw new RuntimeException("Error en la base de datos: " + e.getMessage());
         }
-    } catch (SQLException e) {
-        // ESTO ES VITAL: Imprime el error real en la consola de NetBeans/IntelliJ
-        System.err.println("--- ERROR AL CREAR USUARIO ---");
-        System.err.println("Mensaje: " + e.getMessage());
-        System.err.println("Código de error: " + e.getErrorCode());
-        
-        if (e.getErrorCode() == 1062) { // Código MySQL para entrada duplicada
-            throw new RuntimeException("El nombre de usuario '" + usuario.getUsername() + "' ya está ocupado.");
-        }
+        return -1; 
     }
-    return -1; 
-}
-
     public Usuario buscarPorUsername(String username) {
         String sql = "SELECT * FROM usuarios WHERE username = ?";
         try (Connection conn = Conexion.getConexion();

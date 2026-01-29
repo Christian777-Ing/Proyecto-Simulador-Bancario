@@ -16,35 +16,36 @@ import proyecto.simulador.bancario.modelo.Usuario;
 import proyecto.simulador.bancario.modelo.Cliente;
 import proyecto.simulador.bancario.Service.UsuarioService;
 
-public class RegistroController {
+public class RegistroClienteController {
 
-    @FXML private TextField txtUser, txtPass; // Nota: Usar PasswordField en FXML
     @FXML private TextField txtPNombre, txtSNombre, txtPApellido, txtSApellido;
     @FXML private DatePicker dpFecha;
     @FXML private TextField txtCedula, txtEmail, txtTelf, txtDir;
     @FXML private ComboBox<String> cbSexo;
 
-    private final UsuarioDAO uDao = new UsuarioDAO();
-    private final UsuarioService uServ = new UsuarioService();
     private final ClienteService cServ = new ClienteService();
+    
+    // Esta variable guardará el ID que viene del controlador de Usuario
+    private int idUsuarioVinculado;
+
+    // Método para recibir el ID desde RegistroUsuarioController
+    public void setIdUsuarioVinculado(int id) {
+        this.idUsuarioVinculado = id;
+    }
 
     @FXML
     public void initialize() {
         cbSexo.setItems(FXCollections.observableArrayList("Masculino", "Femenino", "Otro"));
         
-        
+        // Restricción visual de calendario (18 a 130 años)
         LocalDate hace18Anios = LocalDate.now().minusYears(18);
         LocalDate hace130Anios = LocalDate.now().minusYears(130);
-
-         // 1. Sugerir una fecha inicial válida al abrir el calendario
         dpFecha.setValue(hace18Anios);
 
-        // 2. Aplicar la restricción visual
         dpFecha.setDayCellFactory(picker -> new DateCell() {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
                 super.updateItem(date, empty);
-                // Bloquea si es después de "hace 18 años" o antes de "hace 130"
                 setDisable(empty || date.isAfter(hace18Anios) || date.isBefore(hace130Anios));
             }
         });
@@ -53,53 +54,38 @@ public class RegistroController {
     @FXML
     public void onRegistrar() {
         try {
-            // --- PASO 1: VALIDACIONES DE FORMATO Y LÓGICA (Memoria) ---
-            // Validamos usuario y contraseña (sin insertar aún)
-            uServ.validarUsuario(txtUser.getText(), txtPass.getText());
+            // Validaciones locales antes de intentar guardar
+            validarCampos();
 
-            // Validaciones de la interfaz
-            if (dpFecha.getValue() == null) throw new IllegalArgumentException("Fecha de nacimiento obligatoria.");
-            if (cbSexo.getValue() == null) throw new IllegalArgumentException("Debe seleccionar un sexo.");
-            
-            // Validamos los datos del cliente antes de llamar al DAO
-            // (Podemos crear un método de validación en ClienteService que no inserte)
-            validarDatosClienteLocales(); 
-
-            // --- PASO 2: PERSISTENCIA (Base de Datos) ---
-            // Solo llegamos aquí si TODO lo anterior fue correcto.
-            
-            // 1. Intentamos crear el usuario
-            int idGenerado = uServ.registrarNuevoUsuario(txtUser.getText(), txtPass.getText());
-
-            // 2. Intentamos crear el cliente
+            // Registro del cliente usando el ID del usuario creado previamente
             cServ.crearCliente(
                 txtPNombre.getText(), txtSNombre.getText(), txtPApellido.getText(), txtSApellido.getText(),
                 cbSexo.getValue(), dpFecha.getValue(), txtCedula.getText(), txtEmail.getText(),
-                txtTelf.getText(), txtDir.getText(), Cliente.Estado.ACTIVO, idGenerado
+                txtTelf.getText(), txtDir.getText(), Cliente.Estado.ACTIVO, idUsuarioVinculado
             );
 
-            mostrarAlerta(Alert.AlertType.INFORMATION, "Éxito", "Registro completado con éxito.");
-            onVolver();
+            mostrarAlerta(Alert.AlertType.INFORMATION, "Éxito", "Perfil de cliente creado correctamente.");
+            irAlLogin();
 
         } catch (IllegalArgumentException e) {
-            // Si algo falla aquí, NUNCA se ejecutó uServ.registrarNuevoUsuario
             mostrarAlerta(Alert.AlertType.WARNING, "Dato Incorrecto", e.getMessage());
         } catch (Exception e) {
-            mostrarAlerta(Alert.AlertType.ERROR, "Error", e.getMessage());
+            mostrarAlerta(Alert.AlertType.ERROR, "Error del Sistema", e.getMessage());
         }
     }
 
-    // Método auxiliar para validar campos de texto antes de ir a la DB
-    private void validarDatosClienteLocales() {
-        if (txtPNombre.getText().isBlank()) throw new IllegalArgumentException("El nombre es obligatorio.");
+    private void validarCampos() {
+        if (txtPNombre.getText().isBlank()) throw new IllegalArgumentException("El primer nombre es obligatorio.");
+        if (txtPApellido.getText().isBlank()) throw new IllegalArgumentException("El primer apellido es obligatorio.");
         if (txtCedula.getText().length() != 10) throw new IllegalArgumentException("La cédula debe tener 10 dígitos.");
-        // Agrega aquí todas las validaciones de texto que necesites
+        if (dpFecha.getValue() == null) throw new IllegalArgumentException("La fecha de nacimiento es obligatoria.");
+        if (cbSexo.getValue() == null) throw new IllegalArgumentException("Debe seleccionar el sexo.");
     }
-    @FXML
-    public void onVolver() {
+
+    private void irAlLogin() {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/View/LoginView.fxml"));
-            Stage stage = (Stage) txtUser.getScene().getWindow();
+            Stage stage = (Stage) txtPNombre.getScene().getWindow();
             stage.setScene(new Scene(root));
         } catch (IOException e) { e.printStackTrace(); }
     }
@@ -107,6 +93,7 @@ public class RegistroController {
     private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
         Alert alert = new Alert(tipo);
         alert.setTitle(titulo);
+        alert.setHeaderText(null);
         alert.setContentText(mensaje);
         alert.showAndWait();
     }
