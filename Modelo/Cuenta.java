@@ -1,3 +1,5 @@
+package modelo;
+
 import java.math.BigDecimal;
 
 public class Cuenta {
