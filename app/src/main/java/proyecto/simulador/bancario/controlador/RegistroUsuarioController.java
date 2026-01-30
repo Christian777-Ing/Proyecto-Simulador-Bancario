@@ -2,15 +2,21 @@ package proyecto.simulador.bancario.controlador;
 
 import java.io.IOException;
 
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+
+
+
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import proyecto.simulador.bancario.Service.UsuarioService;
+import java.net.URL;
+
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 public class RegistroUsuarioController {
 
@@ -22,37 +28,42 @@ public class RegistroUsuarioController {
     @FXML
     public void onSiguiente() {
         try {
-            // 1. Validar y crear el usuario en la DB
-            int idGenerado = uServ.registrarNuevoUsuario(txtUser.getText(), txtPass.getText());
+            // Usamos el ClassLoader para mayor compatibilidad con Gradle
+            URL fxmlLocation = getClass().getResource("/View/RegistroClienteView.fxml");
+            
+            if (fxmlLocation == null) {
+                // Intento alternativo sin el slash inicial
+                fxmlLocation = getClass().getClassLoader().getResource("View/RegistroClienteView.fxml");
+            }
 
-            // 2. Cargar la vista (Paso 2)
-            // OJO: Verifica que el nombre del archivo sea exactamente este
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/RegistroClienteView.fxml"));
+            if (fxmlLocation == null) {
+                throw new Exception("Error: No se encontró el archivo FXML. Verifique la ruta.");
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent root = loader.load();
 
-            // 3. Pasar el ID
+            // PASO CRÍTICO: Registramos al usuario SOLO si la vista cargó correctamente
+            int idGenerado = uServ.registrarNuevoUsuario(txtUser.getText(), txtPass.getText());
+
             RegistroClienteController clienteCtrl = loader.getController();
             clienteCtrl.setIdUsuarioVinculado(idGenerado);
 
-            // 4. Cambiar escena
             Stage stage = (Stage) txtUser.getScene().getWindow();
             stage.setScene(new Scene(root));
 
-        } catch (IOException e) {
-            mostrarAlerta(Alert.AlertType.ERROR, "Error de Sistema", "No se encontró el archivo FXML del Paso 2.");
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Validación", e.getMessage());
         } catch (Exception e) {
-            mostrarAlerta(Alert.AlertType.ERROR, "Error", "Error inesperado: " + e.getMessage());
             e.printStackTrace();
+            mostrarAlerta(Alert.AlertType.ERROR, "Error de Sistema", e.getMessage());
         }
     }
 
     @FXML
     public void onVolver() {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/View/LoginView.fxml"));
+            Parent root = FXMLLoader.load(
+                    getClass().getResource("/View/LoginView.fxml")
+            );
             Stage stage = (Stage) txtUser.getScene().getWindow();
             stage.setScene(new Scene(root));
         } catch (IOException e) {
@@ -68,3 +79,4 @@ public class RegistroUsuarioController {
         alert.showAndWait();
     }
 }
+
