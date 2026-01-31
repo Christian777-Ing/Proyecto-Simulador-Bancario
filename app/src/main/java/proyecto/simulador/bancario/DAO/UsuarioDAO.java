@@ -64,5 +64,16 @@ public class UsuarioDAO {
         }
         return null;
     }
+
+    public void eliminarUsuario(int idUsuario) {
+        String sql = "DELETE FROM usuarios WHERE id_usuario = ?";
+        try (Connection conn = Conexion.getConexion();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idUsuario);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al revertir registro de usuario: " + e.getMessage());
+        }
+    }
 }
 

@@ -56,24 +56,24 @@ public class ClienteDAO {
     }
 
     public Cliente buscarPorUsuario(int idUsuario) {
-    String sql = "SELECT * FROM clientes WHERE id_usuario = ?";
-    try (Connection conn = Conexion.getConexion();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "SELECT * FROM clientes WHERE id_usuario = ?";
+        try (Connection conn = Conexion.getConexion();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        ps.setInt(1, idUsuario);
-        ResultSet rs = ps.executeQuery();
+            ps.setInt(1, idUsuario);
+            ResultSet rs = ps.executeQuery();
 
-        if (rs.next()) {
-            Cliente c = new Cliente();
-            c.setIdCliente(rs.getInt("id_cliente"));
-            c.setPrimerNombre(rs.getString("primer_nombre"));
-            c.setPrimerApellido(rs.getString("primer_apellido"));
-            c.setIdUsuario(rs.getInt("id_usuario"));
-            return c;
+            if (rs.next()) {
+                Cliente c = new Cliente();
+                c.setIdCliente(rs.getInt("id_cliente"));
+                c.setPrimerNombre(rs.getString("primer_nombre"));
+                c.setPrimerApellido(rs.getString("primer_apellido"));
+                c.setIdUsuario(rs.getInt("id_usuario"));
+                return c;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
+        return null;
     }
-    return null;
-}
 }

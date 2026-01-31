@@ -34,6 +34,7 @@ public class RegistroClienteController {
     @FXML private ComboBox<String> cbSexo;
 
     private final CuentaService cuentaService = new CuentaService();
+    private final UsuarioService usuarioService = new UsuarioService();
 
     // --------- SERVICIO ----------
     private final ClienteService clienteService = new ClienteService();
@@ -156,6 +157,26 @@ public class RegistroClienteController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    @FXML
+    public void onCancelar() {
+        // 1. Confirmar con el usuario
+        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION, 
+            "Si cancelas ahora, se perderán los datos de usuario creados. ¿Deseas continuar?");
+        
+        confirmacion.showAndWait().ifPresent(respuesta -> {
+            if (respuesta == ButtonType.OK) {
+                try {
+                    // 2. Borrar el usuario de la BD
+                    usuarioService.eliminarUsuario(idUsuarioVinculado);
+                    
+                    // 3. Regresar al Login
+                    irAlLogin();
+                } catch (Exception e) {
+                    mostrarAlerta(Alert.AlertType.ERROR, "Error", "No se pudo limpiar el registro.");
+                }
+            }
+        });
     }
 
     // --------- ALERTAS ----------
