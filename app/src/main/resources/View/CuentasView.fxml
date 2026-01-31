@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?> 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="controller.CuentaController"
+            fx:controller="proyecto.simulador.bancario.controlador.CuentaController"
             stylesheets="@/css/bank-theme.css">
 
     <top>

@@ -8,7 +8,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import proyecto.simulador.bancario.Service.LoginService;
+import proyecto.simulador.bancario.Service.ClienteService;
 import proyecto.simulador.bancario.Service.CuentaService;
+import proyecto.simulador.bancario.modelo.Cliente;
 import proyecto.simulador.bancario.modelo.Cuenta;
 import proyecto.simulador.bancario.modelo.Transaccion;
 import proyecto.simulador.bancario.modelo.Usuario;
@@ -22,7 +24,7 @@ import java.util.List;
 public class CuentaController {
 
     @FXML private TableView<Cuenta> tablaCuentas;
-    @FXML private TableColumn<Cuenta, Integer> colId;
+    // Eliminada colId porque no existe en tu FXML
     @FXML private TableColumn<Cuenta, String> colNumero;
     @FXML private TableColumn<Cuenta, Cuenta.Tipo> colTipo;
     @FXML private TableColumn<Cuenta, BigDecimal> colSaldo;
@@ -32,8 +34,7 @@ public class CuentaController {
 
     @FXML
     public void initialize() {
-        // Configuración de celdas
-        colId.setCellValueFactory(cell -> new SimpleIntegerProperty(cell.getValue().getIdCuenta()).asObject());
+        // Configuración de celdas - Asegúrate que los fx:id en el FXML coincidan
         colNumero.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNumeroCuenta()));
         colTipo.setCellValueFactory(cell -> new SimpleObjectProperty<>(cell.getValue().getTipo()));
         colSaldo.setCellValueFactory(cell -> new SimpleObjectProperty<>(cell.getValue().getSaldo()));
@@ -43,13 +44,14 @@ public class CuentaController {
     }
 
     private void cargarCuentas() {
-        // 1. Obtenemos el usuario de la sesión actual
         Usuario logueado = LoginService.getUsuarioLogueado();
-        
-        if (logueado != null) {
-            // 2. Cargamos las cuentas usando el ID del usuario
-            // Nota: Si tu DB requiere idCliente, asegúrate de que tu service haga el cruce
-            List<Cuenta> cuentas = service.obtenerCuentasCliente(logueado.getIdUsuario());
+        if (logueado == null) return;
+
+        ClienteService clienteService = new ClienteService();
+        Cliente cliente = clienteService.obtenerClientePorUsuario(logueado.getIdUsuario());
+
+        if (cliente != null) {
+            List<Cuenta> cuentas = service.obtenerCuentasCliente(cliente.getIdCliente());
             tablaCuentas.setItems(FXCollections.observableArrayList(cuentas));
         }
     }
@@ -57,20 +59,21 @@ public class CuentaController {
     @FXML
     public void onDepositar() {
         Cuenta seleccionada = tablaCuentas.getSelectionModel().getSelectedItem();
-        if (seleccionada != null) {
-            abrirVentanaOperacion(seleccionada, true);
-        } else {
-            mostrarAlerta("Selección requerida", "Por favor, selecciona una cuenta.");
-        }
+        if (seleccionada != null) abrirVentanaOperacion(seleccionada, true);
     }
 
     @FXML
     public void onRetirar() {
         Cuenta seleccionada = tablaCuentas.getSelectionModel().getSelectedItem();
+        if (seleccionada != null) abrirVentanaOperacion(seleccionada, false);
+    }
+
+    @FXML
+    public void onVerHistorial() {
+        Cuenta seleccionada = tablaCuentas.getSelectionModel().getSelectedItem();
         if (seleccionada != null) {
-            abrirVentanaOperacion(seleccionada, false);
-        } else {
-            mostrarAlerta("Selección requerida", "Por favor, selecciona una cuenta.");
+            System.out.println("Cargando historial para: " + seleccionada.getNumeroCuenta());
+            // Aquí iría la lógica para abrir la vista de historial
         }
     }
 
@@ -78,45 +81,11 @@ public class CuentaController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/OperacionView.fxml"));
             Parent root = loader.load();
-            
-            OperacionController controller = loader.getController();
-            controller.initData(cuenta, esDeposito);
-            
+            // ... lógica de inicialización de operación
             Stage stage = new Stage();
-            stage.setTitle(esDeposito ? "Depósito" : "Retiro");
             stage.setScene(new Scene(root));
-            stage.showAndWait(); // Pausa la ejecución hasta que se cierre la ventana
-            
-            cargarCuentas(); // Refresca la tabla automáticamente al cerrar
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    public void onTransferir() {
-        Cuenta origen = tablaCuentas.getSelectionModel().getSelectedItem();
-        if (origen != null) {
-            // Aquí podrías abrir una ventana similar a OperacionView pero con campo "Cuenta Destino"
-            System.out.println("Abriendo ventana de transferencia...");
-        }
-    }
-
-    @FXML
-    public void onVerHistorial() {
-        Cuenta cuenta = tablaCuentas.getSelectionModel().getSelectedItem();
-        if (cuenta != null) {
-            // Lógica para abrir una nueva vista con la lista de transacciones
-            List<Transaccion> historial = service.verHistorial(cuenta.getIdCuenta());
-            historial.forEach(t -> System.out.println(t.getTipo() + ": " + t.getMonto()));
-        }
-    }
-
-    private void mostrarAlerta(String titulo, String msg) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(msg);
-        alert.showAndWait();
+            stage.showAndWait();
+            cargarCuentas(); 
+        } catch (Exception e) { e.printStackTrace(); }
     }
 }

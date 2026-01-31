@@ -72,4 +72,8 @@ public class ClienteService {
     public void cambiarEstado(int idCliente, Cliente.Estado estado) {
         clienteDAO.actualizarEstado(idCliente, estado);
     }
+
+    public Cliente obtenerClientePorUsuario(int idUsuario) {
+        return clienteDAO.buscarPorUsuario(idUsuario);
+    }
 }
