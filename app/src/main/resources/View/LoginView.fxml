@@ -13,7 +13,7 @@
     <!-- Fondo -->
     <ImageView fitWidth="1200" fitHeight="800" preserveRatio="false">
         <image>
-            <Image url="@/img/bg-bank.png"/>
+            <Image url="@/img/bg-bank.jpg"/>
         </image>
     </ImageView>
 

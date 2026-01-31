@@ -14,7 +14,9 @@ import proyecto.simulador.bancario.DAO.UsuarioDAO;
 import proyecto.simulador.bancario.Service.ClienteService;
 import proyecto.simulador.bancario.modelo.Usuario;
 import proyecto.simulador.bancario.modelo.Cliente;
+import proyecto.simulador.bancario.modelo.Cuenta;
 import proyecto.simulador.bancario.Service.UsuarioService;
+import proyecto.simulador.bancario.Service.CuentaService;
 
 public class RegistroClienteController {
 
@@ -30,6 +32,8 @@ public class RegistroClienteController {
 
     @FXML private DatePicker dpFecha;
     @FXML private ComboBox<String> cbSexo;
+
+    private final CuentaService cuentaService = new CuentaService();
 
     // --------- SERVICIO ----------
     private final ClienteService clienteService = new ClienteService();
@@ -86,32 +90,40 @@ public class RegistroClienteController {
     }
 
     // --------- REGISTRO ----------
-     @FXML
+    @FXML
     public void onRegistrar() {
         try {
+            // 1. Validar que los campos no estén vacíos
+            validarCampos();
+
+            // 2. Crear el Perfil de Cliente
             clienteService.crearCliente(
-                    txtPNombre.getText().trim(),
-                    txtSNombre.getText().trim(),
-                    txtPApellido.getText().trim(),
-                    txtSApellido.getText().trim(),
-                    cbSexo.getValue(),
-                    dpFecha.getValue(),
-                    txtCedula.getText().trim(),
-                    txtEmail.getText().trim(),
-                    txtTelefono.getText().trim(),
-                    txtDir.getText().trim(),
-                    Cliente.Estado.ACTIVO,
-                    idUsuarioVinculado
+                    txtPNombre.getText().trim(), txtSNombre.getText().trim(),
+                    txtPApellido.getText().trim(), txtSApellido.getText().trim(),
+                    cbSexo.getValue(), dpFecha.getValue(),
+                    txtCedula.getText().trim(), txtEmail.getText().trim(),
+                    txtTelefono.getText().trim(), txtDir.getText().trim(),
+                    Cliente.Estado.ACTIVO, idUsuarioVinculado
             );
 
-            new Alert(Alert.AlertType.INFORMATION,
-                    "Registro completado correctamente").showAndWait();
+            // 3. Obtener el ID del cliente recién creado para vincular la cuenta
+            Cliente nuevoCliente = clienteService.obtenerClientePorUsuario(idUsuarioVinculado);
+
+            if (nuevoCliente != null) {
+                // 4. Crear la cuenta de ahorros inicial automáticamente
+                cuentaService.crearCuenta(nuevoCliente.getIdCliente(), Cuenta.Tipo.AHORROS);
+                
+                mostrarAlerta(Alert.AlertType.INFORMATION, "¡Éxito!", 
+                    "Perfil creado y Cuenta de Ahorros activada correctamente.");
+            }
 
             irAlLogin();
 
+        } catch (IllegalArgumentException e) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Validación", e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
+            mostrarAlerta(Alert.AlertType.ERROR, "Error de Sistema", "No se pudo completar el registro: " + e.getMessage());
         }
     }
     // --------- VALIDACIONES ----------

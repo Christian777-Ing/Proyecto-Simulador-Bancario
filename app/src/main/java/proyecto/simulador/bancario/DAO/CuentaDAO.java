@@ -91,6 +91,22 @@ public class CuentaDAO {
         }
     }
 
+    public Cuenta buscarPorNumero(String numeroCuenta) {
+        String sql = "SELECT * FROM cuentas WHERE numero_cuenta = ?";
+
+        try (PreparedStatement ps = Conexion.getConexion().prepareStatement(sql)) {
+            ps.setString(1, numeroCuenta);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return mapearCuenta(rs); // Reutilizamos tu lógica de mapeo
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // Si no existe, devolvemos null para manejar el error en el Service
+    }
+
     private Cuenta mapearCuenta(ResultSet rs) throws SQLException {
         Cuenta cuenta = new Cuenta();
         cuenta.setIdCuenta(rs.getInt("id_cuenta"));

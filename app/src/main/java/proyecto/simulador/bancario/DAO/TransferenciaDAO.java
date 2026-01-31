@@ -40,26 +40,46 @@ public class TransferenciaDAO {
     // Listar transacciones por cuenta
     public List<Transaccion> listarPorCuenta(int idCuenta) {
         List<Transaccion> lista = new ArrayList<>();
-        String sql = "SELECT * FROM transacciones WHERE id_cuenta_origen = ? OR id_cuenta_destino = ?";
+        // Usamos LEFT JOIN para traer los números de cuenta (AC...) de origen y destino
+        String sql = "SELECT t.*, " +
+                    "c1.numero_cuenta AS num_origen, " +
+                    "c2.numero_cuenta AS num_destino " +
+                    "FROM transacciones t " +
+                    "LEFT JOIN cuentas c1 ON t.id_cuenta_origen = c1.id_cuenta " +
+                    "LEFT JOIN cuentas c2 ON t.id_cuenta_destino = c2.id_cuenta " +
+                    "WHERE t.id_cuenta_origen = ? OR t.id_cuenta_destino = ? " +
+                    "ORDER BY t.fecha DESC";
 
         try (PreparedStatement ps = Conexion.getConexion().prepareStatement(sql)) {
             ps.setInt(1, idCuenta);
             ps.setInt(2, idCuenta);
             ResultSet rs = ps.executeQuery();
+
             while (rs.next()) {
-                Transaccion t = new Transaccion();
-                t.setIdTransaccion(rs.getInt("id_transaccion"));
-                t.setTipo(Transaccion.Tipo.valueOf(rs.getString("tipo")));
-                t.setMonto(rs.getBigDecimal("monto"));
-                t.setFecha(rs.getTimestamp("fecha").toLocalDateTime());
-                t.setIdCuentaOrigen(rs.getInt("id_cuenta_origen"));
-                int dest = rs.getInt("id_cuenta_destino");
-                t.setIdCuentaDestino(rs.wasNull() ? null : dest);
-                lista.add(t);
+                lista.add(mapearTransaccion(rs));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return lista;
+    }
+
+    private Transaccion mapearTransaccion(ResultSet rs) throws SQLException {
+        Transaccion t = new Transaccion();
+        t.setIdTransaccion(rs.getInt("id_transaccion"));
+        t.setTipo(Transaccion.Tipo.valueOf(rs.getString("tipo")));
+        t.setMonto(rs.getBigDecimal("monto"));
+        t.setFecha(rs.getTimestamp("fecha").toLocalDateTime());
+        t.setIdCuentaOrigen(rs.getInt("id_cuenta_origen"));
+        int idDestino = rs.getInt("id_cuenta_destino");
+        if (!rs.wasNull()) {
+            t.setIdCuentaDestino(idDestino);
+        } else {
+            t.setIdCuentaDestino(null);
+        }
+        // Asignar los números de cuenta legibles
+        t.setNumeroCuentaOrigen(rs.getString("num_origen"));
+        t.setNumeroCuentaDestino(rs.getString("num_destino"));
+        return t;
     }
 }

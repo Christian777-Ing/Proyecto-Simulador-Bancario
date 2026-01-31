@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="20" alignment="CENTER" prefWidth="400" 
+      style="-fx-padding: 30; -fx-background-color: white;" 
+      xmlns:fx="http://javafx.com/fxml" 
+      fx:controller="proyecto.simulador.bancario.controlador.TransferenciaController">
+    
+    <Label text="Transferencia Bancaria" 
+           style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #0A2A43;"/>
+
+    <Separator />
+
+    <VBox spacing="5" style="-fx-background-color: #f8f9fa; -fx-padding: 15; -fx-border-color: #dee2e6; -fx-border-radius: 5;">
+        <Label text="CUENTA DE ORIGEN" style="-fx-font-size: 10; -fx-text-fill: gray; -fx-font-weight: bold;"/>
+        <Label fx:id="lblCuentaOrigen" text="Cargando..." style="-fx-font-size: 14; -fx-font-weight: bold;"/>
+        <Label fx:id="lblSaldoOrigen" text="Saldo disponible: $ 0.00" style="-fx-text-fill: #27ae60;"/>
+    </VBox>
+
+    <VBox spacing="10">
+        <VBox spacing="5">
+            <Label text="Número de cuenta destino:" style="-fx-font-weight: bold;"/>
+            <TextField fx:id="txtCuentaDestino" promptText="Ingrese el número de cuenta (ej. AC123...)" 
+                       prefHeight="35" style="-fx-background-radius: 5;"/>
+        </VBox>
+
+        <VBox spacing="5">
+            <Label text="Monto a enviar:" style="-fx-font-weight: bold;"/>
+            <TextField fx:id="txtMonto" promptText="0.00" 
+                       prefHeight="35" style="-fx-background-radius: 5;"/>
+        </VBox>
+    </VBox>
+
+    <HBox spacing="15" alignment="CENTER">
+        <Button text="Confirmar Transferencia" onAction="#onConfirmarTransferencia" 
+                style="-fx-background-color: #2980b9; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" 
+                prefHeight="40" prefWidth="180"/>
+        
+        <Button text="Cancelar" onAction="#onCancelar" 
+                style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-cursor: hand;" 
+                prefHeight="40" prefWidth="100"/>
+    </HBox>
+</VBox>

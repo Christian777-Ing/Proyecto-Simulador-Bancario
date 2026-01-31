@@ -11,6 +11,11 @@ public class Transaccion {
     private LocalDateTime fecha;
     private int idCuentaOrigen;
     private Integer idCuentaDestino;
+    
+    // NUEVOS CAMPOS: Para mostrar los números de cuenta legibles (ej. AC176...)
+    // Esto resuelve el problema de la columna "Destino" vacía
+    private String numeroCuentaOrigen;
+    private String numeroCuentaDestino;
 
     public enum Tipo {
         DEPOSITO, RETIRO, TRANSFERENCIA
@@ -29,53 +34,30 @@ public class Transaccion {
         this.idCuentaDestino = idCuentaDestino;
     }
 
-    // Getters y Setters
-    public int getIdTransaccion() {
-        return idTransaccion;
-    }
+    // Getters y Setters existentes
+    public int getIdTransaccion() { return idTransaccion; }
+    public void setIdTransaccion(int idTransaccion) { this.idTransaccion = idTransaccion; }
 
-    public void setIdTransaccion(int idTransaccion) {
-        this.idTransaccion = idTransaccion;
-    }
+    public Tipo getTipo() { return tipo; }
+    public void setTipo(Tipo tipo) { this.tipo = tipo; }
 
-    public Tipo getTipo() {
-        return tipo;
-    }
+    public BigDecimal getMonto() { return monto; }
+    public void setMonto(BigDecimal monto) { this.monto = monto; }
 
-    public void setTipo(Tipo tipo) {
-        this.tipo = tipo;
-    }
+    public LocalDateTime getFecha() { return fecha; }
+    public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
 
-    public BigDecimal getMonto() {
-        return monto;
-    }
+    public int getIdCuentaOrigen() { return idCuentaOrigen; }
+    public void setIdCuentaOrigen(int idCuentaOrigen) { this.idCuentaOrigen = idCuentaOrigen; }
 
-    public void setMonto(BigDecimal monto) {
-        this.monto = monto;
-    }
+    public Integer getIdCuentaDestino() { return idCuentaDestino; }
+    public void setIdCuentaDestino(Integer idCuentaDestino) { this.idCuentaDestino = idCuentaDestino; }
 
-    public LocalDateTime getFecha() {
-        return fecha;
-    }
+    // NUEVOS Getters y Setters para los números de cuenta
+    public String getNumeroCuentaOrigen() { return numeroCuentaOrigen; }
+    public void setNumeroCuentaOrigen(String numeroCuentaOrigen) { this.numeroCuentaOrigen = numeroCuentaOrigen; }
 
-    public void setFecha(LocalDateTime fecha) {
-        this.fecha = fecha;
-    }
-
-    public int getIdCuentaOrigen() {
-        return idCuentaOrigen;
-    }
-
-    public void setIdCuentaOrigen(int idCuentaOrigen) {
-        this.idCuentaOrigen = idCuentaOrigen;
-    }
-
-    public Integer getIdCuentaDestino() {
-        return idCuentaDestino;
-    }
-
-    public void setIdCuentaDestino(Integer idCuentaDestino) {
-        this.idCuentaDestino = idCuentaDestino;
-    }
+    public String getNumeroCuentaDestino() { return numeroCuentaDestino; }
+    public void setNumeroCuentaDestino(String numeroCuentaDestino) { this.numeroCuentaDestino = numeroCuentaDestino; }
 }
 

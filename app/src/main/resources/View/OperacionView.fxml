@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
 
-<VBox xmlns:fx="http://javafx.com/fxml"
-      fx:controller="controller.OperacionController"
-      spacing="20" alignment="CENTER"
-      stylesheets="@/css/bank-theme.css"
-      style="-fx-padding:30;">
+<VBox spacing="15" alignment="CENTER" style="-fx-padding: 25; -fx-background-color: white;" 
+      xmlns:fx="http://javafx.com/fxml" 
+      fx:controller="proyecto.simulador.bancario.controlador.OperacionController">
+    
+    <Label fx:id="lblTitulo" text="Operación" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+    <Label fx:id="lblCuentaInfo" text="Cargando..." style="-fx-text-fill: gray;" />
 
-    <Label fx:id="lblTitulo" styleClass="label-title"/>
-    <Label fx:id="lblCuentaInfo"/>
+    <Separator />
 
-    <TextField fx:id="txtMonto" promptText="Monto"/>
+    <VBox spacing="5">
+        <Label text="Monto a ingresar:" />
+        <TextField fx:id="txtMonto" prefHeight="40" promptText="0.00" />
+    </VBox>
 
-    <HBox spacing="15">
-        <Button text="Confirmar" onAction="#onConfirmar"
-                styleClass="button btn-success"/>
-        <Button text="Cancelar" onAction="#onCancelar"
-                styleClass="button btn-danger"/>
+    <HBox spacing="10" alignment="CENTER">
+        <Button text="Confirmar" onAction="#onConfirmar" style="-fx-background-color: #27ae60; -fx-text-fill: white;" />
+        <Button text="Cancelar" onAction="#onCancelar" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" />
     </HBox>
 </VBox>

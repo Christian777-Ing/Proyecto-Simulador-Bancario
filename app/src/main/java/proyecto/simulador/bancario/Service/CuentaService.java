@@ -157,4 +157,30 @@ public class CuentaService {
                 .filter(t -> !t.getFecha().isBefore(start) && !t.getFecha().isAfter(end))
                 .collect(Collectors.toList());
     }
+
+    public Cuenta buscarPorNumero(String numero) {
+        return cuentaDAO.buscarPorNumero(numero); 
+    }
+
+    /**
+     * Transferencia usando el número de cuenta (String)
+     * Resuelve el error de "For input string: AC..."
+     */
+    public void transferirPorNumero(int idCuentaOrigen, String numCuentaDestino, BigDecimal monto) throws Exception {
+        // 1. Buscamos la cuenta destino por su String "ACxxxx"
+        Cuenta destino = buscarPorNumero(numCuentaDestino);
+        
+        // 2. Validación de existencia (Feedback para el usuario)
+        if (destino == null) {
+            throw new Exception("La cuenta destino '" + numCuentaDestino + "' no existe.");
+        }
+
+        // 3. Validamos que no se transfiera a sí mismo
+        if (idCuentaOrigen == destino.getIdCuenta()) {
+            throw new Exception("No puede realizar una transferencia a la misma cuenta de origen.");
+        }
+
+        // 4. Llamamos al método transaccional original usando los IDs internos
+        transferir(idCuentaOrigen, destino.getIdCuenta(), monto);
+    }
 }
