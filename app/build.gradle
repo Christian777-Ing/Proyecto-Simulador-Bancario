@@ -14,6 +14,11 @@ dependencies {
     
     // ← CAMBIO AQUÍ: groupId correcto + versión estable
     implementation 'com.mysql:mysql-connector-j:8.0.33'
+
+    implementation 'com.itextpdf:kernel:7.2.5'
+    implementation 'com.itextpdf:io:7.2.5'
+    implementation 'com.itextpdf:layout:7.2.5'
+    implementation 'com.itextpdf:font-asian:7.2.5'
 }
 
 javafx {

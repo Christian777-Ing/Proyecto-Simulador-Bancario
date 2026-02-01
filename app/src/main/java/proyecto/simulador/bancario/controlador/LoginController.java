@@ -15,20 +15,32 @@ public class LoginController {
     private final LoginService authService = new LoginService();
 
     @FXML
-    public void onLogin() {
-        if (authService.login(txtUsername.getText(), txtPassword.getText())) {
-            String vista = (LoginService.getUsuarioLogueado().getRol().name().equals("ADMIN"))
-                            ? "/View/AdminView.fxml" : "/View/CuentasView.fxml";
+    public void onLogin() { 
+        String user = txtUsername.getText();
+        String pass = txtPassword.getText();
+
+        if (authService.login(user, pass)) {
+            String rol = LoginService.getUsuarioLogueado().getRol().name();
+            
+            String vista = rol.equals("ADMIN") ? "/View/AdminView.fxml" : "/View/CuentasView.fxml";
             navegar(vista);
         } else {
-            new Alert(Alert.AlertType.ERROR, "Credenciales inválidas").show();
+            mostrarAlerta("Error", "Usuario o contraseña incorrectos", Alert.AlertType.ERROR);
         }
     }
 
-    // AHORA REDIRIGE AL PASO 1 (USUARIO)
-    @FXML 
-    public void onIrARegistro() { 
-        navegar("/View/RegistroUsuarioView.fxml"); 
+
+    @FXML
+    public void onIrARegistro() {
+        navegar("/View/RegistroUsuarioView.fxml");
+    }
+
+    private void mostrarAlerta(String titulo, String mensaje, Alert.AlertType tipo) {
+        Alert alert = new Alert(tipo);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
     }
 
     private void navegar(String fxml) {
@@ -38,7 +50,7 @@ public class LoginController {
             stage.setScene(new Scene(root));
         } catch (Exception e) { 
             e.printStackTrace(); 
-            new Alert(Alert.AlertType.ERROR, "Error al cargar la vista: " + fxml).show();
+            mostrarAlerta("Error de Sistema", "No se pudo cargar la vista: " + fxml, Alert.AlertType.ERROR);
         }
     }
 }

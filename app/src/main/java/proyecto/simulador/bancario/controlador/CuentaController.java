@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import proyecto.simulador.bancario.Service.LoginService;
@@ -15,13 +16,31 @@ import proyecto.simulador.bancario.modelo.Cliente;
 import proyecto.simulador.bancario.modelo.Cuenta;
 import proyecto.simulador.bancario.modelo.Transaccion;
 import proyecto.simulador.bancario.modelo.Usuario;
+import proyecto.simulador.bancario.DAO.TransferenciaDAO;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
+
+import java.io.File;
+
+import com.itextpdf.kernel.colors.ColorConstants;
+import com.itextpdf.kernel.colors.DeviceRgb;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.borders.Border;
+import com.itextpdf.layout.borders.SolidBorder;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.UnitValue;
 
 public class CuentaController {
 
@@ -31,36 +50,63 @@ public class CuentaController {
     @FXML private TableColumn<Cuenta, Cuenta.Tipo> colTipo;
     @FXML private TableColumn<Cuenta, BigDecimal> colSaldo;
     @FXML private TableColumn<Cuenta, Cuenta.Estado> colEstado;
+    @FXML private Button btnAdminPanel;
 
     private final CuentaService service = new CuentaService();
+    private final TransferenciaDAO tranfeDAO = new TransferenciaDAO();
+    
 
     @FXML
     public void initialize() {
-        // 1. Configuración de celdas básica
+        // 1. Configuración de columnas (Tu código existente...)
         colNumero.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNumeroCuenta()));
         colTipo.setCellValueFactory(cell -> new SimpleObjectProperty<>(cell.getValue().getTipo()));
         colSaldo.setCellValueFactory(cell -> new SimpleObjectProperty<>(cell.getValue().getSaldo()));
         colEstado.setCellValueFactory(cell -> new SimpleObjectProperty<>(cell.getValue().getEstado()));
 
-        // 2. Formateo visual de la columna Saldo (Símbolo $ y Color)
+        // 2. Formateo visual del Saldo (Tu código existente...)
         colSaldo.setCellFactory(column -> new TableCell<Cuenta, BigDecimal>() {
             @Override
             protected void updateItem(BigDecimal saldo, boolean empty) {
                 super.updateItem(saldo, empty);
                 if (empty || saldo == null) {
-                    setText(null);
-                    setStyle(""); 
+                    setText(null); setStyle(""); 
                 } else {
-                    // Formato: $ 1,250.00
                     setText(String.format("$ %.2f", saldo));
-                    // Le damos un toque elegante en verde
                     setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
                 }
             }
         });
 
-        // 3. Cargar los datos de la BD
+        // --- MEJORAS DE USABILIDAD ---
+        
+        // 3. Forzar el foco en la tabla para que las flechas funcionen de inmediato
+        Platform.runLater(() -> {
+            tablaCuentas.requestFocus();
+            if (!tablaCuentas.getItems().isEmpty()) {
+                tablaCuentas.getSelectionModel().selectFirst();
+            }
+        });
+
+        // 4. Manejo de teclado: ENTER selecciona y abre "Depositar"
+        tablaCuentas.setOnKeyPressed(event -> {
+            if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
+                if (tablaCuentas.getSelectionModel().getSelectedItem() != null) {
+                    onDepositar(); // Abre la ventana de depósito
+                }
+            }
+        });
+
+        configurarSegunRol();
         cargarCuentas();
+    }
+
+    private void configurarSegunRol() {
+        Usuario logueado = LoginService.getUsuarioLogueado();
+        if (logueado != null && "ADMIN".equals(logueado.getRol())) {
+            btnAdminPanel.setVisible(true);
+            btnAdminPanel.setManaged(true);
+        }
     }
 
     private void cargarCuentas() {
@@ -218,6 +264,215 @@ public class CuentaController {
         } catch (Exception e) {
             e.printStackTrace();
             mostrarAlerta("Error de carga", "No se pudo abrir la ventana de transferencia. Verifique la ruta del FXML.");
+        }
+    }
+
+    @FXML
+    private void onDesactivarCuenta() {
+        // 1. Obtener la cuenta seleccionada de la tabla
+        Cuenta seleccionada = tablaCuentas.getSelectionModel().getSelectedItem();
+
+        if (seleccionada == null) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Selección Requerida", 
+                        "Por favor, selecciona la cuenta que deseas desactivar.");
+            return;
+        }
+
+        // 2. No permitir desactivar una cuenta que ya está inactiva
+        if (seleccionada.getEstado() == Cuenta.Estado.CERRADA) {
+            mostrarAlerta(Alert.AlertType.INFORMATION, "Aviso", "Esta cuenta ya se encuentra inactiva.");
+            return;
+        }
+
+        // 3. Confirmación de seguridad
+        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmacion.setTitle("Confirmar Desactivación");
+        confirmacion.setHeaderText("¿Desactivar cuenta N° " + seleccionada.getNumeroCuenta() + "?");
+        confirmacion.setContentText("Esta acción impedirá realizar operaciones. Solo podrá reactivarse en ventanilla.");
+
+        if (confirmacion.showAndWait().get() == ButtonType.OK) {
+            try {
+                // Llamamos al servicio (que debería validar saldo $0)
+                service.desactivarCuenta(seleccionada);
+                
+                mostrarAlerta(Alert.AlertType.INFORMATION, "Éxito", "La cuenta ha sido desactivada.");
+                cargarCuentas(); // Refrescar la tabla para ver el cambio de estado
+            } catch (Exception e) {
+                mostrarAlerta(Alert.AlertType.ERROR, "Error", e.getMessage());
+            }
+        }
+    }
+    @FXML
+    public void onAbrirAdmin() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/AdminDashboard.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setTitle("Panel de Administración Global");
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (Exception e) {
+            mostrarAlerta(Alert.AlertType.ERROR, "Error", "No se pudo abrir el panel de administración.");
+        }
+    }
+
+    @FXML
+    public void onAbrirPerfil() {
+        try {
+            String ruta = "/View/PerfilView.fxml";
+            java.net.URL url = getClass().getResource(ruta);
+            
+            if (url == null) {
+                throw new RuntimeException("No se encontró el archivo FXML en: " + ruta);
+            }
+
+            FXMLLoader loader = new FXMLLoader(url);
+            javafx.scene.Parent root = loader.load();
+            
+            javafx.stage.Stage stage = new javafx.stage.Stage();
+            stage.setTitle("Mi Perfil de Usuario");
+            stage.setScene(new javafx.scene.Scene(root));
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+            stage.show();
+            
+        } catch (Exception e) {
+            System.err.println("Error crítico al cargar perfil:");
+            e.printStackTrace();
+            
+            // Alerta visual para el usuario
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error de Sistema");
+            alert.setHeaderText("No se pudo cargar la vista de Perfil");
+            alert.setContentText("Verifica que PerfilView.fxml esté en la carpeta correcta.");
+            alert.showAndWait();
+        }
+    }
+
+    @FXML
+    public void onLogout() {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "¿Desea cerrar sesión?", ButtonType.YES, ButtonType.NO);
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.YES) {
+                try {
+                    // Limpiar usuario en el servicio
+                    LoginService.setUsuarioLogueado(null);
+                    
+                    // Volver al Login
+                    Parent root = FXMLLoader.load(getClass().getResource("/View/LoginView.fxml"));
+                    Stage stage = (Stage) tablaCuentas.getScene().getWindow();
+                    stage.setScene(new Scene(root));
+                    stage.setTitle("Simulador Bancario - Login");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    @FXML
+    public void onGenerarPDF() {
+        Cuenta seleccionada = tablaCuentas.getSelectionModel().getSelectedItem();
+        if (seleccionada == null) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Selección Requerida", "Selecciona una cuenta para generar el PDF.");
+            return;
+        }
+
+        List<Transaccion> historial = tranfeDAO.listarPorCuenta(seleccionada.getIdCuenta());
+        
+        // --- LÓGICA PARA LA RUTA DE DESCARGAS ---
+        String home = System.getProperty("user.home");
+        // Usamos File.separator para que funcione en Windows (\) y Linux/Mac (/)
+        String ruta = home + File.separator + "Downloads" + File.separator + "Reporte_Cuenta_" + seleccionada.getNumeroCuenta() + ".pdf";
+        
+        try {
+            PdfWriter writer = new PdfWriter(ruta);
+            PdfDocument pdf = new PdfDocument(writer);
+            Document documento = new Document(pdf);
+
+            // Colores institucionales
+            DeviceRgb azulBancario = new DeviceRgb(0, 51, 102);
+            DeviceRgb grisFondo = new DeviceRgb(245, 245, 245);
+
+            // 1. Título con línea decorativa
+            documento.add(new Paragraph("BANCO CENTRAL DE ESPOL - ESTADO DE CUENTA")
+                    .setFontColor(azulBancario)
+                    .setFontSize(22)
+                    .setBold()
+                    .setTextAlignment(TextAlignment.LEFT));
+            
+            documento.add(new Paragraph("______________________________________________________________________________")
+                    .setFontColor(ColorConstants.GRAY)
+                    .setMarginBottom(10));
+
+            // 2. Bloque de Información General
+            Table infoHeader = new Table(2).useAllAvailableWidth();
+            infoHeader.setMarginBottom(20);
+            
+            // Celda Izquierda: Datos del cliente/cuenta
+            Cell infoCell = new Cell();
+            infoCell.add(new Paragraph("Detalles del Cliente\n").setBold().setFontSize(12));
+            infoCell.add(new Paragraph("Cuenta N°: " + seleccionada.getNumeroCuenta() + "\nTipo: " + seleccionada.getTipo()));
+            infoCell.setBorder(Border.NO_BORDER);
+            
+            // Celda Derecha: Saldo destacado
+            Cell saldoCell = new Cell()
+                    .add(new Paragraph("SALDO TOTAL\n").setBold())
+                    .add(new Paragraph("$" + seleccionada.getSaldo()).setFontSize(18).setFontColor(azulBancario).setBold())
+                    .setTextAlignment(TextAlignment.RIGHT)
+                    .setBackgroundColor(grisFondo)
+                    .setPadding(10)
+                    .setBorder(new SolidBorder(azulBancario, 1));
+
+            infoHeader.addCell(infoCell);
+            infoHeader.addCell(saldoCell);
+            documento.add(infoHeader);
+
+            // 3. Tabla de Movimientos Estilizada
+            documento.add(new Paragraph("HISTORIAL DE MOVIMIENTOS").setBold().setFontSize(14).setMarginBottom(10));
+            
+            Table tabla = new Table(UnitValue.createPercentArray(new float[]{25, 50, 25})).useAllAvailableWidth();
+            
+            // Encabezados
+            String[] titulos = {"FECHA", "CONCEPTO", "VALOR"};
+            for (String t : titulos) {
+                tabla.addHeaderCell(new Cell().add(new Paragraph(t).setFontColor(ColorConstants.WHITE).setBold())
+                        .setBackgroundColor(azulBancario)
+                        .setTextAlignment(TextAlignment.CENTER)
+                        .setPadding(8));
+            }
+
+            // Datos con efecto cebra
+            for (int i = 0; i < historial.size(); i++) {
+                Transaccion trans = historial.get(i);
+                boolean esPar = (i % 2 == 0);
+                
+                Cell cFecha = new Cell().add(new Paragraph(trans.getFecha().toString())).setTextAlignment(TextAlignment.CENTER);
+                Cell cTipo = new Cell().add(new Paragraph(trans.getTipo().toString()));
+                Cell cMonto = new Cell().add(new Paragraph("$" + trans.getMonto())).setTextAlignment(TextAlignment.RIGHT);
+
+                if (!esPar) {
+                    cFecha.setBackgroundColor(grisFondo);
+                    cTipo.setBackgroundColor(grisFondo);
+                    cMonto.setBackgroundColor(grisFondo);
+                }
+
+                tabla.addCell(cFecha.setPadding(5));
+                tabla.addCell(cTipo.setPadding(5));
+                tabla.addCell(cMonto.setPadding(5));
+            }
+
+            documento.add(tabla);
+            
+            // 4. Pie de página
+            documento.add(new Paragraph("\nEste documento es un reporte oficial. Fecha de generación: " + java.time.LocalDateTime.now())
+                    .setFontSize(8).setFontColor(ColorConstants.GRAY).setTextAlignment(TextAlignment.CENTER));
+
+            documento.close();
+            mostrarAlerta(Alert.AlertType.INFORMATION, "Éxito", "El PDF se ha guardado en tu carpeta de Descargas:\n" + ruta);
+
+        } catch (Exception e) {
+            mostrarAlerta(Alert.AlertType.ERROR, "Error de Generación", "No se pudo crear el archivo: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

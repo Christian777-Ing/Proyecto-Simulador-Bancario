@@ -65,6 +65,36 @@ public class UsuarioDAO {
         return null;
     }
 
+    public boolean actualizarPassword(int idUsuario, String passActual, String passNueva) {
+        // 1. Primero verificamos si la contraseña actual es correcta
+        String sqlVerificar = "SELECT password_hash FROM usuarios WHERE id_usuario = ? AND password_hash = ?";
+        
+        // 2. Si coincide, actualizamos
+        String sqlActualizar = "UPDATE usuarios SET password_hash = ? WHERE id_usuario = ?";
+
+        try (Connection conn = Conexion.getConexion()) {
+            // Validación manual para evitar errores de espacios
+            PreparedStatement psVerificar = conn.prepareStatement(sqlVerificar);
+            psVerificar.setInt(1, idUsuario);
+            psVerificar.setString(2, passActual.trim()); // Importante el .trim()
+            
+            ResultSet rs = psVerificar.executeQuery();
+
+            if (rs.next()) {
+                // Si entró aquí, la clave coincide. Procedemos a cambiarla.
+                PreparedStatement psUpdate = conn.prepareStatement(sqlActualizar);
+                psUpdate.setString(1, passNueva.trim());
+                psUpdate.setInt(2, idUsuario);
+                
+                int filasAfectadas = psUpdate.executeUpdate();
+                return filasAfectadas > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false; // Retorna false si la clave actual no coincide o hubo error
+    }
+
     public void eliminarUsuario(int idUsuario) {
         String sql = "DELETE FROM usuarios WHERE id_usuario = ?";
         try (Connection conn = Conexion.getConexion();

@@ -7,13 +7,12 @@ import proyecto.simulador.bancario.DAO.UsuarioDAO;
 public class LoginService {
     
     private final UsuarioDAO usuarioDAO = new UsuarioDAO();
-    private static Usuario usuarioLogueado; // Sesión global
+    private static Usuario usuarioLogueado; 
 
     public boolean login(String username, String password) {
         Usuario user = usuarioDAO.buscarPorUsername(username);
         
-        // Aquí comparas el password. 
-        // Si usas hash real sería: BCrypt.checkpw(password, user.getPasswordHash())
+        // Verificación básica (Recuerda usar hashing en producción)
         if (user != null && user.getPasswordHash().equals(password)) {
             usuarioLogueado = user;
             return true;
@@ -23,5 +22,15 @@ public class LoginService {
 
     public static Usuario getUsuarioLogueado() {
         return usuarioLogueado;
+    }
+
+    // Crucial para que el botón 'Cerrar Sesión' del CuentaController funcione
+    public static void setUsuarioLogueado(Usuario usuario) {
+        usuarioLogueado = usuario;
+    }
+
+    // Método de conveniencia para verificar roles rápidamente
+    public static boolean esAdmin() {
+        return usuarioLogueado != null && "ADMIN".equals(usuarioLogueado.getRol());
     }
 }

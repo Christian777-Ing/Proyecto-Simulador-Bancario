@@ -10,9 +10,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import proyecto.simulador.bancario.DAO.UsuarioDAO;
 import proyecto.simulador.bancario.Service.ClienteService;
-import proyecto.simulador.bancario.modelo.Usuario;
 import proyecto.simulador.bancario.modelo.Cliente;
 import proyecto.simulador.bancario.modelo.Cuenta;
 import proyecto.simulador.bancario.Service.UsuarioService;
@@ -137,10 +135,20 @@ public class RegistroClienteController {
 
         if (!txtCedula.getText().matches("\\d{10}"))
             throw new IllegalArgumentException("La cédula debe tener exactamente 10 dígitos.");
-
+        if (txtEmail.getText().isBlank())
+            throw new IllegalArgumentException("El email es obligatorio.");
+        if (txtTelefono.getText().isBlank())
+            throw new IllegalArgumentException("El teléfono es obligatorio.");
+        if (txtDir.getText().isBlank())
+            throw new IllegalArgumentException("La dirección es obligatoria.");
+        if (txtCedula.getText().isBlank())
+            throw new IllegalArgumentException("La cédula es obligatoria.");
+        if (txtPApellido.getText().isBlank())
+            throw new IllegalArgumentException("El primer apellido es obligatorio.");
+        if (txtPNombre.getText().isBlank())
+            throw new IllegalArgumentException("El primer nombre es obligatorio.");
         if (cbSexo.getValue() == null)
             throw new IllegalArgumentException("Debe seleccionar el sexo.");
-
         if (dpFecha.getValue() == null)
             throw new IllegalArgumentException("Debe seleccionar la fecha de nacimiento.");
     }

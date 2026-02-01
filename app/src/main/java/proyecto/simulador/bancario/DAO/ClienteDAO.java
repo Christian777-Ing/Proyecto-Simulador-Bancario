@@ -76,4 +76,19 @@ public class ClienteDAO {
         }
         return null;
     }
+
+    public String obtenerEstadoPorId(int idCliente) {
+        String sql = "SELECT estado FROM clientes WHERE id_cliente = ?";
+        try (Connection conn = Conexion.getConexion();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idCliente);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("estado");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "ACTIVO"; // Por defecto si hay error
+    }
 }

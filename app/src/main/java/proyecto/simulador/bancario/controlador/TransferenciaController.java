@@ -1,6 +1,8 @@
 package proyecto.simulador.bancario.controlador;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import proyecto.simulador.bancario.modelo.Cuenta;
 import proyecto.simulador.bancario.Service.CuentaService;
@@ -11,25 +13,37 @@ public class TransferenciaController {
     @FXML private Label lblSaldoOrigen;
     @FXML private TextField txtCuentaDestino;
     @FXML private TextField txtMonto;
+    @FXML private TextField txtCedulaDestino;
+    @FXML private Label lblNombreDestinatario;
+    @FXML private Button btnConfirmar;
+    @FXML private VBox paneValidacion;
     
     private Cuenta cuentaOrigen;
     private final CuentaService service = new CuentaService();
 
     // Método para recibir los datos de la cuenta que envía
     public void initData(Cuenta origen) {
-    this.cuentaOrigen = origen;
-    
-    // Mapeo de datos para que el usuario no tenga que recordar (Reconocimiento vs Recuerdo)
-    lblCuentaOrigen.setText(origen.getNumeroCuenta());
-    lblSaldoOrigen.setText(String.format("Saldo disponible: $ %.2f", origen.getSaldo()));
-    
-    // Restricción para el campo de monto (solo números)
-    txtMonto.textProperty().addListener((obs, oldV, newV) -> {
-        if (!newV.matches("\\d*(\\.\\d*)?")) {
-            txtMonto.setText(oldV);
-        }
-    });
-}
+        this.cuentaOrigen = origen;
+        lblCuentaOrigen.setText(origen.getNumeroCuenta());
+        lblSaldoOrigen.setText(String.format("Saldo disponible: $ %.2f", origen.getSaldo()));
+        
+        // Restricción para el campo de monto
+        txtMonto.textProperty().addListener((obs, oldV, newV) -> {
+            if (!newV.matches("\\d*(\\.\\d*)?")) {
+                txtMonto.setText(oldV);
+            }
+        });
+
+        // --- NUEVO: Listeners para invalidar si el usuario cambia el texto ---
+        txtCuentaDestino.textProperty().addListener((obs, oldV, newV) -> invalidarConfirmacion());
+        txtCedulaDestino.textProperty().addListener((obs, oldV, newV) -> invalidarConfirmacion());
+    }
+
+    private void invalidarConfirmacion() {
+        btnConfirmar.setDisable(true);
+        paneValidacion.setVisible(false);
+        lblNombreDestinatario.setText("");
+    }
 
     @FXML
     public void onConfirmarTransferencia() {
@@ -81,5 +95,38 @@ public class TransferenciaController {
     private void cerrarVentana() {
         Stage stage = (Stage) txtMonto.getScene().getWindow();
         stage.close();
+    }
+    
+    @FXML
+    private void onVerificarDestinatario() {
+        String cuenta = txtCuentaDestino.getText().trim();
+        String cedula = txtCedulaDestino.getText().trim();
+
+        System.out.println("Validando: Cuenta=" + cuenta + " Cedula=" + cedula); // Debug
+
+        try {
+            String nombre = service.validarTitular(cuenta, cedula);
+            
+            if (nombre != null) {
+                lblNombreDestinatario.setText(nombre);
+                paneValidacion.setVisible(true);
+                paneValidacion.setManaged(true); // Asegura que ocupe espacio
+                btnConfirmar.setDisable(false);
+                System.out.println("Validación exitosa: " + nombre);
+            }
+        } catch (Exception e) {
+            System.out.println("Error en validación: " + e.getMessage());
+            mostrarAlerta("Error de validación", e.getMessage());
+            paneValidacion.setVisible(false);
+            btnConfirmar.setDisable(true);
+        }
+    }
+
+    private void mostrarAlerta(String titulo, String mensaje) {
+        Alert alerta = new Alert(Alert.AlertType.ERROR);
+        alerta.setTitle(titulo);
+        alerta.setHeaderText(null);
+        alerta.setContentText(mensaje);
+        alerta.showAndWait();
     }
 }

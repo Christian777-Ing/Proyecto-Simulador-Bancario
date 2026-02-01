@@ -56,7 +56,7 @@ public class OperacionController {
             BigDecimal monto = new BigDecimal(txtMonto.getText());
             
             if (monto.compareTo(BigDecimal.ZERO) <= 0) {
-                throw new IllegalArgumentException("El monto debe ser un valor positivo.");
+                throw new IllegalArgumentException("El monto debe ser mayor a cero.");
             }
 
             if (esDeposito) {

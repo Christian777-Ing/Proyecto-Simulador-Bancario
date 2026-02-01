@@ -1,5 +1,6 @@
 package proyecto.simulador.bancario.Service;
 
+import proyecto.simulador.bancario.DAO.ClienteDAO;
 import proyecto.simulador.bancario.DAO.CuentaDAO;
 import proyecto.simulador.bancario.DAO.TransferenciaDAO;
 import proyecto.simulador.bancario.Data_Base.Conexion;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 public class CuentaService {
 
     private final CuentaDAO cuentaDAO = new CuentaDAO();
+    private final ClienteDAO clienteDAO = new ClienteDAO();
     private final TransferenciaDAO transferenciaDAO = new TransferenciaDAO();
 
     // Crear cuenta
@@ -116,12 +118,23 @@ public class CuentaService {
     }
 
     // Validación de cuenta activa
-    private void validarCuentaActiva(Cuenta cuenta) {
+    private void validarCuentaActiva(Cuenta cuenta) throws Exception {
         if (cuenta == null)
-            throw new IllegalStateException("Cuenta no existe");
+            throw new IllegalStateException("La cuenta no existe.");
+
+        // 1. Validar estado de la cuenta (lo que ya tenías)
         if (cuenta.getEstado() != Cuenta.Estado.ACTIVA)
-            throw new IllegalStateException("Cuenta bloqueada o cerrada");
+            throw new IllegalStateException("Esta cuenta específica está bloqueada o cerrada.");
+
+        // 2. ¡EL BLOQUEO MAESTRO!: Validar estado del cliente
+        // Buscamos si el dueño de la cuenta está bloqueado
+        String estadoCliente = clienteDAO.obtenerEstadoPorId(cuenta.getIdCliente());
+        
+        if ("BLOQUEADO".equalsIgnoreCase(estadoCliente)) {
+            throw new Exception("OPERACIÓN DENEGADA: Su usuario ha sido bloqueado por el administrador.");
+        }
     }
+
 
     // Generar número de cuenta
     private String generarNumeroCuenta() {
@@ -183,4 +196,43 @@ public class CuentaService {
         // 4. Llamamos al método transaccional original usando los IDs internos
         transferir(idCuentaOrigen, destino.getIdCuenta(), monto);
     }
+
+    public String validarTitular(String numeroCuenta, String cedula) throws Exception {
+        // 1. Validaciones básicas de formato
+        if (numeroCuenta == null || numeroCuenta.isEmpty() || cedula == null || cedula.isEmpty()) {
+            throw new Exception("Debe ingresar el número de cuenta y la cédula.");
+        }
+
+        // 2. Llamada al DAO
+        String nombreCompleto = cuentaDAO.obtenerNombreTitular(numeroCuenta, cedula);
+
+        // 3. Si no se encuentra, lanzamos error
+        if (nombreCompleto == null) {
+            throw new Exception("Los datos no coinciden. Verifique el número de cuenta y la cédula.");
+        }
+
+        return nombreCompleto;
+    }
+
+    public void desactivarCuenta(Cuenta cuenta) throws Exception {
+        // 1. Verificación de seguridad
+        if (cuenta == null || cuenta.getIdCuenta() <= 0) {
+            throw new Exception("Datos de cuenta inválidos para desactivación.");
+        }
+
+        // 2. Verificación de saldo (Evitar que quede dinero atrapado)
+        if (cuenta.getSaldo().compareTo(BigDecimal.ZERO) > 0) {
+            throw new Exception("No puedes desactivar una cuenta con saldo positivo ($" + cuenta.getSaldo() + ")");
+        }
+
+        // 3. Ejecución en BD
+        boolean exito = cuentaDAO.desactivarCuentaDB(cuenta.getIdCuenta());
+        
+        if (!exito) {
+            // Si llega aquí con ID 3, es que el registro no existe en la tabla o hubo un error de conexión
+            throw new Exception("No se pudo actualizar la base de datos. Verifique que la cuenta aún exista.");
+        }
+    }
+
+
 }

@@ -45,4 +45,15 @@ public class UsuarioService {
     public void eliminarUsuario(int idUsuario) {
         usuarioDAO.eliminarUsuario(idUsuario);
     }
+
+    public boolean cambiarPassword(int idUsuario, String actual, String nueva) {
+        // Reutilizamos la validación del patrón PASS_PATTERN
+        if (nueva == null || !PASS_PATTERN.matcher(nueva).matches()) {
+            throw new IllegalArgumentException(
+                "La nueva contraseña no cumple los requisitos: 8 caracteres, mayúscula, número y especial."
+            );
+        }
+        // Llamamos al DAO para la persistencia
+        return usuarioDAO.actualizarPassword(idUsuario, actual, nueva);
+    }
 }
