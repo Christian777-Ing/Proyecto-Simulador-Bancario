@@ -14,7 +14,7 @@ import proyecto.simulador.bancario.modelo.Transaccion;
 
 public class TransferenciaDAO {
     
-// Registrar transacción
+    // Registrar transacción
     public void crearTransferencia(Transaccion t) {
         String sql = """
             INSERT INTO transacciones (tipo, monto, fecha, id_cuenta_origen, id_cuenta_destino)
@@ -40,7 +40,6 @@ public class TransferenciaDAO {
     // Listar transacciones por cuenta
     public List<Transaccion> listarPorCuenta(int idCuenta) {
         List<Transaccion> lista = new ArrayList<>();
-        // Usamos LEFT JOIN para traer los números de cuenta (AC...) de origen y destino
         String sql = "SELECT t.*, " +
                     "c1.numero_cuenta AS num_origen, " +
                     "c2.numero_cuenta AS num_destino " +

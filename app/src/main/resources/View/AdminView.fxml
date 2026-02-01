@@ -8,7 +8,7 @@
    <children>
       <HBox alignment="CENTER_RIGHT" prefHeight="60.0" spacing="15.0" style="-fx-background-color: #1a252f;">
          <children>
-            <Label style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16;" text="SISTEMA BANCARIO - PANEL DE CONTROL" />
+            <Label style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16;" text="PANEL DE CONTROL BANCARIO" />
             <Region HBox.hgrow="ALWAYS" />
             <Button mnemonicParsing="false" onAction="#onLogout" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="Cerrar Sesión" />
          </children>
@@ -39,7 +39,7 @@
 
                               <VBox prefHeight="100.0" HBox.hgrow="ALWAYS" style="-fx-background-color: #2c3e50; -fx-background-radius: 10;">
                                  <children>
-                                    <Label style="-fx-text-fill: #bdc3c7; -fx-font-size: 13;" text="TOTAL CLIENTES" />
+                                    <Label style="-fx-text-fill: #bdc3c7; -fx-font-size: 13;" text="TOTAL USUARIOS" />
                                     <Label fx:id="lblTotalUsuarios" style="-fx-text-fill: #3498db; -fx-font-size: 26; -fx-font-weight: bold;" text="0" />
                                  </children>
                                  <padding><Insets bottom="15.0" left="20.0" right="20.0" top="15.0" /></padding>
@@ -55,7 +55,7 @@
                            </children>
                         </HBox>
 
-                        <Label style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Listado Global de Usuarios" />
+                        <Label style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Listado General de Usuarios" />
                         
                         <TableView fx:id="tablaUsuarios" VBox.vgrow="ALWAYS">
                           <columns>

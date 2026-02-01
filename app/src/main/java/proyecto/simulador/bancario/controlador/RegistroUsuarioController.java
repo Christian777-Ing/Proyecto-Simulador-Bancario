@@ -86,7 +86,7 @@ public class RegistroUsuarioController {
     @FXML
     public void onSiguiente() {
         try {
-            // ... (Tu código de carga de FXML se mantiene igual) ...
+            // Cargar el FXML de RegistroClienteView.fxml
             URL fxmlLocation = getClass().getResource("/View/RegistroClienteView.fxml");
             if (fxmlLocation == null) {
                 fxmlLocation = getClass().getClassLoader().getResource("View/RegistroClienteView.fxml");
@@ -97,8 +97,7 @@ public class RegistroUsuarioController {
             FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent root = loader.load();
 
-            // REGISTRO: Aquí el uServ ya no lanzará error porque el botón 
-            // solo se habilitó si la clave cumplía el patrón.
+            // Registrar el usuario y obtener el ID generado
             int idGenerado = uServ.registrarNuevoUsuario(txtUser.getText(), txtPass.getText());
 
             RegistroClienteController clienteCtrl = loader.getController();

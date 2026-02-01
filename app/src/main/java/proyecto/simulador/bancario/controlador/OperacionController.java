@@ -23,7 +23,7 @@ public class OperacionController {
         this.cuenta = cuenta;
         this.esDeposito = esDeposito;
         
-        // Heurística #1: Visibilidad del estado del sistema
+        // Configuración dinámica del título y el placeholder
         if (esDeposito) {
             lblTitulo.setText("DEPOSITAR DINERO");
             lblTitulo.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;"); // Verde éxito
@@ -34,10 +34,10 @@ public class OperacionController {
             txtMonto.setPromptText("Monto a retirar");
         }
         
-        // Proporciona contexto claro (Principio de Norman: Conocimiento en el mundo)
+        // Proporcionar información de la cuenta
         lblCuentaInfo.setText("Cuenta seleccionada: " + cuenta.getNumeroCuenta());
         
-        // Heurística #5: Prevención de errores (solo números y un punto)
+        // Validación en tiempo real para aceptar solo números y punto decimal
         txtMonto.textProperty().addListener((obs, oldV, newV) -> {
             if (!newV.matches("\\d*(\\.\\d*)?")) {
                 txtMonto.setText(oldV);
@@ -48,7 +48,7 @@ public class OperacionController {
     @FXML
     public void onConfirmar() {
         try {
-            // Validación de campo vacío (Heurística #5: Prevención)
+            // Validación de campo vacío 
             if (txtMonto.getText().trim().isEmpty()) {
                 throw new IllegalArgumentException("Por favor, ingrese un monto para continuar.");
             }

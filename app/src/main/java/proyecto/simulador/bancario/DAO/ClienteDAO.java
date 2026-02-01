@@ -10,6 +10,7 @@ import proyecto.simulador.bancario.modelo.Cliente;
 
 public class ClienteDAO {
 
+    // Crear un nuevo cliente en la base de datos
     public void crearCliente(Cliente cliente) {
 
         String sql = """
@@ -44,6 +45,7 @@ public class ClienteDAO {
         }
     }
 
+    // Actualizar el estado de un cliente
     public void actualizarEstado(int idCliente, Cliente.Estado estado) {
         String sql = "UPDATE clientes SET estado = ? WHERE id_cliente = ?";
         try (PreparedStatement ps = Conexion.getConexion().prepareStatement(sql)) {
@@ -55,6 +57,7 @@ public class ClienteDAO {
         }
     }
 
+    // Buscar cliente por ID de usuario
     public Cliente buscarPorUsuario(int idUsuario) {
         String sql = "SELECT * FROM clientes WHERE id_usuario = ?";
         try (Connection conn = Conexion.getConexion();
@@ -77,6 +80,7 @@ public class ClienteDAO {
         return null;
     }
 
+    // Obtener el estado del cliente (ACTIVO/INACTIVO) por su ID de cliente
     public String obtenerEstadoPorId(int idCliente) {
         String sql = "SELECT estado FROM clientes WHERE id_cliente = ?";
         try (Connection conn = Conexion.getConexion();
@@ -89,6 +93,6 @@ public class ClienteDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return "ACTIVO"; // Por defecto si hay error
+        return "ACTIVO"; 
     }
 }

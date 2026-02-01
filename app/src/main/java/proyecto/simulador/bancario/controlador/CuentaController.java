@@ -452,7 +452,7 @@ public class CuentaController {
 
         List<Transaccion> historial = tranfeDAO.listarPorCuenta(seleccionada.getIdCuenta());
         
-        // --- LÓGICA PARA LA RUTA DE DESCARGAS ---
+        // Definir la ruta de guardado en la carpeta Descargas del usuario
         String home = System.getProperty("user.home");
         // Usamos File.separator para que funcione en Windows (\) y Linux/Mac (/)
         String ruta = home + File.separator + "Downloads" + File.separator + "Reporte_Cuenta_" + seleccionada.getNumeroCuenta() + ".pdf";

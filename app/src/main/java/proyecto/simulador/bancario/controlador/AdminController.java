@@ -40,7 +40,7 @@ public class AdminController {
     @FXML private TableColumn<Usuario, String> colUsername, colRol;
 
     @FXML private Label lblTotalUsuarios;    // Para el conteo de usuarios
-    @FXML private Label lblUsuariosBloqueados;  // Opcional: para saber cuántos están bloqueados
+    @FXML private Label lblUsuariosBloqueados;  // Para saber cuántos están bloqueados
 
     // Servicios y DAOs
     private final AdminDAO adminDAO = new AdminDAO();

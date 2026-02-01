@@ -102,8 +102,6 @@ public class TransferenciaController {
         String cuenta = txtCuentaDestino.getText().trim();
         String cedula = txtCedulaDestino.getText().trim();
 
-        System.out.println("Validando: Cuenta=" + cuenta + " Cedula=" + cedula); // Debug
-
         try {
             String nombre = service.validarTitular(cuenta, cedula);
             

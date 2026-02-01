@@ -35,17 +35,17 @@ public class ClienteService {
         if (fechaNac.isAfter(hoy)) {
             throw new IllegalArgumentException("La fecha de nacimiento no puede ser una fecha futura.");
         }
-
+        // Calcular edad
         int edad = Period.between(fechaNac, hoy).getYears();
+        // Validación de mayoría de edad
         if (edad < 18) {
             throw new IllegalArgumentException("Debe ser mayor de 18 años (Edad: " + edad + ").");
         }
-
+        // Validación de edad máxima razonable
         if (edad > 130) {
             throw new IllegalArgumentException("La edad no puede superar los 130 años (Edad: " + edad + ").");
         }
 
-        // Crear el objeto Cliente
         Cliente cliente = new Cliente();
         cliente.setPrimerNombre(pNombre);
         cliente.setSegundoNombre(sNombre);

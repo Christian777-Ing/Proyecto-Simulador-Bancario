@@ -11,7 +11,6 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         // 1. Apuntamos a la nueva vista de Login
-        // Recuerda que definimos que está en /View/LoginView.fxml
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/LoginView.fxml"));
         Parent root = loader.load();
 
@@ -21,7 +20,7 @@ public class MainApp extends Application {
         // 3. Configuramos el escenario (ventana) principal
         primaryStage.setTitle("Simulador Bancario - Inicio de Sesión");
         primaryStage.setScene(scene);
-        primaryStage.setResizable(false); // Opcional: para que el login tenga tamaño fijo
+        primaryStage.setResizable(false); 
         primaryStage.show();
     }
 

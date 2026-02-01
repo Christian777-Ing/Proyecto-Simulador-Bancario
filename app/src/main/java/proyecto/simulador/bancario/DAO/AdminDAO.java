@@ -17,6 +17,7 @@ import proyecto.simulador.bancario.modelo.Usuario;
 
 public class AdminDAO {
 
+    // Obtener el patrimonio total del banco sumando los saldos de todas las cuentas
     public BigDecimal obtenerPatrimonioTotal() {
         String sql = "SELECT SUM(saldo) FROM cuentas";
         try (Connection conn = Conexion.getConexion();
@@ -45,7 +46,7 @@ public class AdminDAO {
         return lista;
     }
 
-    // NUEVO: Mapa de estados para no tocar la clase Usuario
+    // Obtener un mapa de estados de clientes por su ID de usuario
     public Map<Integer, String> obtenerEstadosClientes() {
         Map<Integer, String> estados = new HashMap<>();
         String sql = "SELECT id_usuario, estado FROM clientes";
@@ -59,6 +60,7 @@ public class AdminDAO {
         return estados;
     }
 
+    // Cambiar el estado de un cliente (ACTIVO/INACTIVO) por su ID de usuario
     public boolean cambiarEstadoCliente(int idUsuario, String nuevoEstado) {
         String sql = "UPDATE clientes SET estado = ? WHERE id_usuario = ?";
         try (Connection conn = Conexion.getConexion();
@@ -72,6 +74,7 @@ public class AdminDAO {
         }
     }
 
+    // Obtener detalles completos del cliente por su ID de usuario
     public Cliente obtenerDetallesCliente(int idUsuario) {
         String sql = "SELECT * FROM clientes WHERE id_usuario = ?";
         try (Connection conn = Conexion.getConexion();
@@ -98,6 +101,7 @@ public class AdminDAO {
         return null;
     }
 
+    // Listar todas las cuentas asociadas a un ID de usuario
     public List<Cuenta> listarCuentasPorUsuario(int idUsuario) {
         List<Cuenta> cuentas = new ArrayList<>();
         // Consulta que une el id_usuario con sus cuentas pasando por la tabla clientes
@@ -137,6 +141,7 @@ public class AdminDAO {
         return cuentas;
     }
 
+    // Obtener el estado del cliente (ACTIVO/INACTIVO) por su ID de usuario
     public String obtenerEstadoClientePorUsuario(int idUsuario) {
         Cliente cliente = obtenerDetallesCliente(idUsuario);
         if (cliente == null) {

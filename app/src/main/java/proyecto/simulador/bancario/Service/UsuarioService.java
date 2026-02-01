@@ -17,15 +17,15 @@ public class UsuarioService {
         // 2. Crear objeto y guardar
         Usuario usuario = new Usuario();
         usuario.setUsername(username);
-        usuario.setPasswordHash(password); // Idealmente usar un BCrypt aquí
+        usuario.setPasswordHash(password);
         usuario.setRol(rol);
         
-        return usuarioDAO.crearUsuario(usuario); // Retorna el ID generado
+        return usuarioDAO.crearUsuario(usuario); 
     }
     public int registrarNuevoUsuario(String user, String pass) {
-        validarUsuario(user, pass); // Usa tus validaciones de patrones ya existentes
+        validarUsuario(user, pass); 
         Usuario u = new Usuario(0, user, pass, Usuario.Rol.CLIENTE);
-        return usuarioDAO.crearUsuario(u); // Llama al DAO actualizado
+        return usuarioDAO.crearUsuario(u); 
     }
 
     public void validarUsuario(String username, String password) {
@@ -47,13 +47,11 @@ public class UsuarioService {
     }
 
     public boolean cambiarPassword(int idUsuario, String actual, String nueva) {
-        // Reutilizamos la validación del patrón PASS_PATTERN
         if (nueva == null || !PASS_PATTERN.matcher(nueva).matches()) {
             throw new IllegalArgumentException(
                 "La nueva contraseña no cumple los requisitos: 8 caracteres, mayúscula, número y especial."
             );
         }
-        // Llamamos al DAO para la persistencia
         return usuarioDAO.actualizarPassword(idUsuario, actual, nueva);
     }
 }

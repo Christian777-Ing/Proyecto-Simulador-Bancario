@@ -66,17 +66,14 @@ public class UsuarioDAO {
     }
 
     public boolean actualizarPassword(int idUsuario, String passActual, String passNueva) {
-        // 1. Primero verificamos si la contraseña actual es correcta
         String sqlVerificar = "SELECT password_hash FROM usuarios WHERE id_usuario = ? AND password_hash = ?";
-        
-        // 2. Si coincide, actualizamos
         String sqlActualizar = "UPDATE usuarios SET password_hash = ? WHERE id_usuario = ?";
 
         try (Connection conn = Conexion.getConexion()) {
             // Validación manual para evitar errores de espacios
             PreparedStatement psVerificar = conn.prepareStatement(sqlVerificar);
             psVerificar.setInt(1, idUsuario);
-            psVerificar.setString(2, passActual.trim()); // Importante el .trim()
+            psVerificar.setString(2, passActual.trim());
             
             ResultSet rs = psVerificar.executeQuery();
 

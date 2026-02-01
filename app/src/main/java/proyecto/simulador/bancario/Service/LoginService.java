@@ -12,7 +12,7 @@ public class LoginService {
     public boolean login(String username, String password) {
         Usuario user = usuarioDAO.buscarPorUsername(username);
         
-        // Verificación básica (Recuerda usar hashing en producción)
+        // Verificación básica de credenciales
         if (user != null && user.getPasswordHash().equals(password)) {
             usuarioLogueado = user;
             return true;

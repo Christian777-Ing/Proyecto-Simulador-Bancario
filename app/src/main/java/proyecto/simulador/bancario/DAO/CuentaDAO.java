@@ -12,7 +12,6 @@ import proyecto.simulador.bancario.modelo.Cuenta;
 public class CuentaDAO {
     
     public void crearCuenta(Cuenta cuenta) {
-        // Lógica para insertar una cuenta en la base de datos
         String sql = "INSERT INTO cuentas (numero_cuenta, tipo, saldo, estado, id_cliente) " +
                      "VALUES (?, ?, ?, ?, ?)";
 
@@ -67,7 +66,6 @@ public class CuentaDAO {
     }
 
     public void actualizarSaldo( int idCuenta, java.math.BigDecimal nuevoSaldo) {
-        // Lógica para actualizar el saldo de una cuenta
         String sql = "UPDATE cuentas SET saldo = ? WHERE id_cuenta = ?";
 
         try (PreparedStatement ps = Conexion.getConexion().prepareStatement(sql)) {
@@ -80,7 +78,6 @@ public class CuentaDAO {
     }
 
     public void cerrarCuenta(int idCuenta) {
-        // Lógica para cerrar una cuenta (cambiar su estado a CERRADA)
         String sql = "UPDATE cuentas SET estado = ? WHERE id_cuenta = ?";
 
         try (PreparedStatement ps = Conexion.getConexion().prepareStatement(sql)) {
@@ -100,7 +97,7 @@ public class CuentaDAO {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                return mapearCuenta(rs); // Reutilizamos tu lógica de mapeo
+                return mapearCuenta(rs); 
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -125,9 +122,10 @@ public class CuentaDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null; // No coinciden o no existe
+        return null;
     }
 
+    // Mapeo de ResultSet a Objeto Cuenta
     private Cuenta mapearCuenta(ResultSet rs) throws SQLException {
         Cuenta cuenta = new Cuenta();
         cuenta.setIdCuenta(rs.getInt("id_cuenta"));
@@ -139,10 +137,10 @@ public class CuentaDAO {
         return cuenta;
     }
 
+    // Obtener el nombre completo del titular dado el número de cuenta y cédula
     public String obtenerNombreTitular(String numeroCuenta, String cedula) {
         String nombreCompleto = null;
-        
-        // Usamos los nombres reales de tus columnas: primer_nombre y primer_apellido
+
         String sql = "SELECT cl.primer_nombre, cl.primer_apellido FROM clientes cl " +
                     "INNER JOIN cuentas cu ON cl.id_cliente = cu.id_cliente " +
                     "WHERE cu.numero_cuenta = ? AND cl.cedula = ?";
@@ -155,13 +153,11 @@ public class CuentaDAO {
             
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    // Formamos el nombre combinando las columnas reales
                     nombreCompleto = rs.getString("primer_nombre") + " " + rs.getString("primer_apellido");
                 }
             }
         } catch (SQLException e) {
             System.err.println("❌ Error en SQL obtenerNombreTitular: " + e.getMessage());
-            // Es vital imprimir el error para debuguear sintaxis
             e.printStackTrace(); 
         }
         return nombreCompleto;
@@ -174,10 +170,6 @@ public class CuentaDAO {
             
             ps.setInt(1, idCuenta);
             int filas = ps.executeUpdate();
-            
-            // Si no tienes autocommit, añade esto:
-            // conn.commit(); 
-            
             return filas > 0;
         } catch (SQLException e) {
             e.printStackTrace();

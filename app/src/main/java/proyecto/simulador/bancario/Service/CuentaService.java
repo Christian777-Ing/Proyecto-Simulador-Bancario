@@ -9,7 +9,6 @@ import proyecto.simulador.bancario.modelo.Transaccion;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -122,12 +121,11 @@ public class CuentaService {
         if (cuenta == null)
             throw new IllegalStateException("La cuenta no existe.");
 
-        // 1. Validar estado de la cuenta (lo que ya tenías)
+        // 1. Validar estado de la cuenta
         if (cuenta.getEstado() != Cuenta.Estado.ACTIVA)
             throw new IllegalStateException("Esta cuenta específica está bloqueada o cerrada.");
 
-        // 2. ¡EL BLOQUEO MAESTRO!: Validar estado del cliente
-        // Buscamos si el dueño de la cuenta está bloqueado
+        // 2. Validar estado del cliente asociado
         String estadoCliente = clienteDAO.obtenerEstadoPorId(cuenta.getIdCliente());
         
         if ("BLOQUEADO".equalsIgnoreCase(estadoCliente)) {
@@ -175,15 +173,12 @@ public class CuentaService {
         return cuentaDAO.buscarPorNumero(numero); 
     }
 
-    /**
-     * Transferencia usando el número de cuenta (String)
-     * Resuelve el error de "For input string: AC..."
-     */
+    // Transferir por número de cuenta
     public void transferirPorNumero(int idCuentaOrigen, String numCuentaDestino, BigDecimal monto) throws Exception {
         // 1. Buscamos la cuenta destino por su String "ACxxxx"
         Cuenta destino = buscarPorNumero(numCuentaDestino);
         
-        // 2. Validación de existencia (Feedback para el usuario)
+        // 2. Validación de existencia de la cuenta destino
         if (destino == null) {
             throw new Exception("La cuenta destino '" + numCuentaDestino + "' no existe.");
         }
@@ -229,7 +224,6 @@ public class CuentaService {
         boolean exito = cuentaDAO.desactivarCuentaDB(cuenta.getIdCuenta());
         
         if (!exito) {
-            // Si llega aquí con ID 3, es que el registro no existe en la tabla o hubo un error de conexión
             throw new Exception("No se pudo actualizar la base de datos. Verifique que la cuenta aún exista.");
         }
     }
