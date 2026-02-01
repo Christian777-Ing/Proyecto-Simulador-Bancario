@@ -1,6 +1,25 @@
 # 🏦 Sistema de Simulación Bancaria - "Banco Digital"
 
-Bienvenido al **Simulador Bancario**, una aplicación de escritorio de alto nivel desarrollada en **Java 21** y **JavaFX**. Este proyecto integra una arquitectura robusta (DAO/Service) con un diseño centrado en el usuario basado en las **Heurísticas de Nielsen** y los **Principios de Norman**.
+Bienvenido al **Simulador Bancario**, una aplicación de escritorio de alto nivel desarrollada en **Java 21** y **JavaFX**. Este sistema integra una arquitectura profesional basada en servicios, persistencia robusta y una Experiencia de Usuario (UX) diseñada bajo las **Heurísticas de Nielsen** y los **Principios de Norman**.
+
+---
+
+## 🗄️ Persistencia y Arquitectura de Datos
+
+El corazón del sistema es una base de datos **MySQL**, gestionada mediante una conexión eficiente y segura.
+
+### 🔌 Conexión Profesional (Patrón Singleton)
+Se implementó la clase `Conexion` bajo el patrón **Singleton**, garantizando una única instancia de conexión para optimizar el rendimiento, asegurar la consistencia de las transacciones y evitar fugas de memoria.
+
+
+
+### 🔑 Gestión de Roles y Acceso al Sistema
+* **Clientes:** Pueden realizar un auto-registro desde la interfaz, completando sus datos personales y credenciales con validaciones en tiempo real.
+* **Administradores:** Por seguridad bancaria, **no existe el registro público de administradores**. El acceso de nivel administrativo debe configurarse directamente en la base de datos por personal autorizado:
+  ```sql
+  -- Ejemplo de inserción manual para acceso Admin
+    INSERT INTO usuarios (username, password_hash, rol) 
+    VALUES ('admin', 'admin123', 'ADMIN');
 
 ---
 
