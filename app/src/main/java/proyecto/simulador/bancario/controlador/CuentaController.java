@@ -1,6 +1,8 @@
 package proyecto.simulador.bancario.controlador;
 
 import javafx.collections.FXCollections;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -45,12 +47,18 @@ import com.itextpdf.layout.properties.UnitValue;
 public class CuentaController {
 
     @FXML private TableView<Cuenta> tablaCuentas;
-    // Eliminada colId porque no existe en tu FXML
     @FXML private TableColumn<Cuenta, String> colNumero;
     @FXML private TableColumn<Cuenta, Cuenta.Tipo> colTipo;
     @FXML private TableColumn<Cuenta, BigDecimal> colSaldo;
     @FXML private TableColumn<Cuenta, Cuenta.Estado> colEstado;
     @FXML private Button btnAdminPanel;
+    @FXML private Label lblSaldoTotal;
+    @FXML private TextField txtBuscar;
+
+    // --- AÑADE ESTAS LÍNEAS PARA EL NUEVO FXML ---
+    @FXML private Label lblNombreUsuario; 
+    @FXML private Button btnDepositar;
+    @FXML private Button btnRetirar;
 
     private final CuentaService service = new CuentaService();
     private final TransferenciaDAO tranfeDAO = new TransferenciaDAO();
@@ -58,29 +66,58 @@ public class CuentaController {
 
     @FXML
     public void initialize() {
-        // 1. Configuración de columnas (Tu código existente...)
+        // 1. Configuración de Columnas (Mapeo de datos)
         colNumero.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNumeroCuenta()));
         colTipo.setCellValueFactory(cell -> new SimpleObjectProperty<>(cell.getValue().getTipo()));
-        colSaldo.setCellValueFactory(cell -> new SimpleObjectProperty<>(cell.getValue().getSaldo()));
         colEstado.setCellValueFactory(cell -> new SimpleObjectProperty<>(cell.getValue().getEstado()));
-
-        // 2. Formateo visual del Saldo (Tu código existente...)
+        
+        // 2. Formateo visual del Saldo (Heurística: Visibilidad del estado del sistema)
+        colSaldo.setCellValueFactory(cell -> new SimpleObjectProperty<>(cell.getValue().getSaldo()));
         colSaldo.setCellFactory(column -> new TableCell<Cuenta, BigDecimal>() {
             @Override
             protected void updateItem(BigDecimal saldo, boolean empty) {
                 super.updateItem(saldo, empty);
                 if (empty || saldo == null) {
-                    setText(null); setStyle(""); 
+                    setText(null);
+                    setStyle(""); 
                 } else {
                     setText(String.format("$ %.2f", saldo));
+                    // Estilo verde esmeralda para saldos positivos
                     setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
                 }
             }
         });
 
-        // --- MEJORAS DE USABILIDAD ---
-        
-        // 3. Forzar el foco en la tabla para que las flechas funcionen de inmediato
+        // 3. Carga Inicial de Datos y Perfil
+        cargarCuentas(); 
+        actualizarInformacionUsuario(); // Nueva función para el lblNombreUsuario
+
+        // 4. Implementación del Buscador en Tiempo Real
+        // Importante: Usamos una lista observable para que el filtrado sea reactivo
+        FilteredList<Cuenta> filteredData = new FilteredList<>(tablaCuentas.getItems(), p -> true);
+
+        txtBuscar.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredData.setPredicate(cuenta -> {
+                if (newValue == null || newValue.trim().isEmpty()) {
+                    return true;
+                }
+                String lowerCaseFilter = newValue.toLowerCase();
+
+                if (cuenta.getNumeroCuenta().toLowerCase().contains(lowerCaseFilter)) return true;
+                if (cuenta.getTipo().toString().toLowerCase().contains(lowerCaseFilter)) return true;
+                if (cuenta.getEstado().toString().toLowerCase().contains(lowerCaseFilter)) return true;
+                
+                return false; 
+            });
+            actualizarSaldoTotalFiltrado(filteredData); // Actualiza el total según lo que ves en pantalla
+        });
+
+        // Vincular la lista filtrada con el ordenamiento de la tabla
+        SortedList<Cuenta> sortedData = new SortedList<>(filteredData);
+        sortedData.comparatorProperty().bind(tablaCuentas.comparatorProperty());
+        tablaCuentas.setItems(sortedData);
+
+        // 5. UX: Foco inicial y Atajos
         Platform.runLater(() -> {
             tablaCuentas.requestFocus();
             if (!tablaCuentas.getItems().isEmpty()) {
@@ -88,19 +125,39 @@ public class CuentaController {
             }
         });
 
-        // 4. Manejo de teclado: ENTER selecciona y abre "Depositar"
         tablaCuentas.setOnKeyPressed(event -> {
             if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
                 if (tablaCuentas.getSelectionModel().getSelectedItem() != null) {
-                    onDepositar(); // Abre la ventana de depósito
+                    onDepositar();
                 }
             }
         });
 
+        // 6. Seguridad y Totales
         configurarSegunRol();
-        cargarCuentas();
+        actualizarSaldoTotal(); 
     }
 
+    /**
+     * Método auxiliar para setear el nombre del usuario en el Sidebar del FXML
+     */
+    private void actualizarInformacionUsuario() {
+        Usuario logueado = LoginService.getUsuarioLogueado();
+        if (logueado != null && lblNombreUsuario != null) {
+            // Ponemos el nombre en Mayúsculas para que combine con el estilo "BIENVENIDO"
+            lblNombreUsuario.setText(logueado.getUsername().toUpperCase());
+        }
+    }
+
+    /**
+     * Mantiene el Dashboard de saldo actualizado incluso cuando el usuario filtra la tabla
+     */
+    private void actualizarSaldoTotalFiltrado(FilteredList<Cuenta> listaFiltrada) {
+        BigDecimal total = listaFiltrada.stream()
+                .map(Cuenta::getSaldo)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        lblSaldoTotal.setText(String.format("$ %.2f", total));
+    }
     private void configurarSegunRol() {
         Usuario logueado = LoginService.getUsuarioLogueado();
         if (logueado != null && "ADMIN".equals(logueado.getRol())) {
@@ -119,6 +176,9 @@ public class CuentaController {
         if (cliente != null) {
             List<Cuenta> cuentas = service.obtenerCuentasCliente(cliente.getIdCliente());
             tablaCuentas.setItems(FXCollections.observableArrayList(cuentas));
+            
+            // Nueva línea para actualizar el dashboard superior
+            actualizarSaldoTotal(); 
         }
     }
 
@@ -201,6 +261,19 @@ public class CuentaController {
             mostrarAlerta(Alert.AlertType.ERROR, "Error de Carga", "No se pudo abrir la ventana de operación.");
             e.printStackTrace();
         }
+    }
+    @FXML
+    public void onRefrescar() {
+        cargarCuentas();
+        actualizarSaldoTotal();
+    }
+
+    private void actualizarSaldoTotal() {
+        BigDecimal total = tablaCuentas.getItems().stream()
+                .map(Cuenta::getSaldo)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        lblSaldoTotal.setText(String.format("$ %.2f", total));
     }
 
     @FXML

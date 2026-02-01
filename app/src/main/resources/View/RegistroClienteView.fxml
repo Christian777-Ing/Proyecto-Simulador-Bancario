@@ -10,7 +10,7 @@
     <VBox spacing="0" alignment="TOP_CENTER" maxWidth="550" maxHeight="700"
           style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
         
-        <VBox spacing="8" alignment="CENTER" style="-fx-background-color: #27ae60; -fx-padding: 25; -fx-background-radius: 15 15 0 0;">
+        <VBox spacing="8" alignment="CENTER" style="-fx-background-color: #3498db; -fx-padding: 25; -fx-background-radius: 15 15 0 0;">
             <Text text="INFORMACIÓN PERSONAL" style="-fx-fill: white; -fx-font-size: 20; -fx-font-weight: bold; -fx-letter-spacing: 1;"/>
             <HBox alignment="CENTER" spacing="10">
                 <Label text="USUARIO ✓" style="-fx-text-fill: #d1f2eb;"/>
